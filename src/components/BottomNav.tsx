@@ -20,7 +20,7 @@ export const BottomNav = () => {
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto">
       <div className="flex">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/history')}
           className={`flex-1 py-3 flex flex-col items-center gap-1 ${
             isMentalFileActive ? 'text-primary' : 'text-gray-500'
           }`}

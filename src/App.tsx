@@ -24,7 +24,8 @@ const AppContent = () => {
   
   const showBottomNav = 
     location.pathname === '/history' ||
-    location.pathname === '/my';
+    location.pathname === '/my' ||
+    location.pathname.startsWith('/my/');
 
   const isLaunchPage = location.pathname === '/launch';
   const isAgreementPage = 
