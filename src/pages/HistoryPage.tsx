@@ -19,7 +19,7 @@ export const HistoryPage = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container pb-24">
       {/* 头部 */}
       <div className="sticky top-0 bg-background z-10 px-4 py-4">
         <button
