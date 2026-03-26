@@ -27,10 +27,6 @@ const AppContent = () => {
     location.pathname === '/my' ||
     location.pathname.startsWith('/my/');
 
-  const isLaunchPage = location.pathname === '/launch';
-  const isAgreementPage = 
-    location.pathname.startsWith('/agreement/');
-
   return (
     <>
       <Routes>
@@ -53,7 +49,7 @@ const AppContent = () => {
         <Route path="*" element={<Navigate to="/launch" replace />} />
       </Routes>
       
-      {showBottomNav && !isLaunchPage && !isAgreementPage && <BottomNav />}
+      {showBottomNav && <BottomNav />}
     </>
   );
 };
