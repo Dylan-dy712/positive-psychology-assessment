@@ -56,7 +56,6 @@ export const CheckInPage = () => {
         <div className="grid grid-cols-7 gap-2 mb-6">
           {[1, 2, 3, 4, 5, 6, 7].map((day) => {
             const isChecked = day <= userData.consecutiveCheckInDays;
-            const isToday = day === userData.consecutiveCheckInDays + 1 && !hasCheckedIn;
             
             return (
               <div
