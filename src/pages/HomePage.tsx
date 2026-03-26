@@ -22,7 +22,7 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-container pb-24">
       {/* 头部 */}
       <div className="pt-12 pb-6 text-center">
         <h1 className="text-2xl font-bold text-primary mb-2">心灵档案</h1>

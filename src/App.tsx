@@ -23,6 +23,7 @@ const AppContent = () => {
   const location = useLocation();
   
   const showBottomNav = 
+    location.pathname === '/' ||
     location.pathname === '/history' ||
     location.pathname === '/my' ||
     location.pathname.startsWith('/my/');

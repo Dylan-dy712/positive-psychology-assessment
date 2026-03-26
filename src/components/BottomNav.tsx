@@ -4,14 +4,14 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isMentalFileActive = location.pathname === '/history';
+  const isMentalFileActive = location.pathname === '/' || location.pathname === '/history';
   const isMyActive = location.pathname === '/my' || location.pathname.startsWith('/my/');
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-lg z-50 pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-lg z-[100]">
       <div className="flex max-w-md mx-auto">
         <button
-          onClick={() => navigate('/history')}
+          onClick={() => navigate('/')}
           className={`flex-1 py-4 flex flex-col items-center gap-1 transition-colors ${
             isMentalFileActive ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'
           }`}
