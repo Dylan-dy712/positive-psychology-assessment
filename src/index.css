@@ -15,10 +15,10 @@
   
   body {
     background-image: url('/beijingse.svg');
-    background-size: cover;
-    background-position: center center;
+    background-size: 100% auto;
+    background-position: center top;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-color: #F0F9FF;
     color: #1F2937;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
