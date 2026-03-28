@@ -15,10 +15,9 @@
   
   body {
     background-image: url('/background.png');
-    background-size: cover;
+    background-size: 100% auto;
     background-position: center top;
     background-repeat: no-repeat;
-    background-attachment: fixed;
     background-color: #ffffff;
     color: #1F2937;
     -webkit-font-smoothing: antialiased;
