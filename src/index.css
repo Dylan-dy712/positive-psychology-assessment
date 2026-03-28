@@ -14,11 +14,7 @@
   }
   
   body {
-    background-image: url('/background.png');
-    background-size: 100% auto;
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-color: #ffffff;
+    background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 60%, #FFFFFF 100%);
     color: #1F2937;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -26,17 +22,12 @@
     font-size: 16px;
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
   
-  /* 移动端安全区域适配 */
-  @supports (padding-top: env(safe-area-inset-top)) {
-    body {
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-    }
-  }
+  /* 移动端安全区域适配 - 移除body的padding，不影响背景图 */
 }
 
 @layer components {
@@ -127,6 +118,13 @@
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
   
+  .page-content-white {
+    background-color: #ffffff;
+    margin-top: 120px;
+    border-radius: 24px 24px 0 0;
+    min-height: calc(100vh - 120px);
+  }
+  
   @media (min-width: 640px) {
     .page-container {
       max-width: 28rem;
@@ -155,11 +153,7 @@
   }
   
   .bg-background {
-    background-image: url('/background.png');
-    background-size: 100vw auto;
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background: linear-gradient(180deg, #E0F2FE 0%, #F0F9FF 60%, #FFFFFF 100%);
   }
   
   .bg-primary {

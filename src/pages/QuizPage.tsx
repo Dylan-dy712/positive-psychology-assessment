@@ -119,66 +119,69 @@ export const QuizPage = () => {
   return (
     <div className="page-container">
       {/* 头部 */}
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <h1 className="text-lg font-bold text-primary text-center">
           {assessment.name}（{assessment.shortName}）
         </h1>
       </div>
 
-      {/* 进度条 */}
-      <div className="px-4 mb-6">
-        <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-center text-gray-500 text-sm mt-2">
-          {currentQuestion}/{assessment.questionCount}
-        </p>
-      </div>
-
-      {/* 题目 */}
-      <div className="px-4 mb-6">
-        <h2 className="text-lg font-bold text-gray-800 text-center leading-relaxed">
-          {question.text}
-        </h2>
-      </div>
-
-      {/* 选项 */}
-      <div className="px-4 space-y-3 mb-8">
-        {assessment.options.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => handleOptionSelect(option.value)}
-            className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 ${
-              selectedOption === option.value
-                ? 'border-primary bg-blue-50'
-                : 'border-gray-200 bg-white hover:border-gray-300'
-            }`}
-          >
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        {/* 进度条 */}
+        <div className="px-4 mb-6">
+          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-center text-gray-500 text-sm mt-2">
+            {currentQuestion}/{assessment.questionCount}
+          </p>
+        </div>
+
+        {/* 题目 */}
+        <div className="px-4 mb-6">
+          <h2 className="text-lg font-bold text-gray-800 text-center leading-relaxed">
+            {question.text}
+          </h2>
+        </div>
+
+        {/* 选项 */}
+        <div className="px-4 space-y-3 mb-8">
+          {assessment.options.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleOptionSelect(option.value)}
+              className={`w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3 ${
                 selectedOption === option.value
-                  ? 'border-primary'
-                  : 'border-gray-300'
+                  ? 'border-primary bg-blue-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
-              {selectedOption === option.value && (
-                <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-              )}
-            </div>
-            <span
-              className={`${
-                selectedOption === option.value
-                  ? 'text-primary font-medium'
-                  : 'text-gray-700'
-              }`}
-            >
-              {option.label}
-            </span>
-          </button>
-        ))}
+              <div
+                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                  selectedOption === option.value
+                    ? 'border-primary'
+                    : 'border-gray-300'
+                }`}
+              >
+                {selectedOption === option.value && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                )}
+              </div>
+              <span
+                className={`${
+                  selectedOption === option.value
+                    ? 'text-primary font-medium'
+                    : 'text-gray-700'
+                }`}
+              >
+                {option.label}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 底部按钮 */}

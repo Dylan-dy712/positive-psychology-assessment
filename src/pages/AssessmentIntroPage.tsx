@@ -126,7 +126,7 @@ export const AssessmentIntroPage = () => {
 
   return (
     <div className="page-container">
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <button
           onClick={handleBack}
           className="flex items-center gap-1 text-primary font-medium hover:opacity-80 transition-opacity"
@@ -142,121 +142,124 @@ export const AssessmentIntroPage = () => {
         </h1>
       </div>
 
-      <div className="px-4 mb-6">
-        <div className="flex gap-4">
-          <div className="flex-1 bg-primary text-white rounded-xl p-4 flex items-center gap-3">
-            <FileText className="w-6 h-6" />
-            <div>
-              <p className="text-sm opacity-90">共{assessment.questionCount}题</p>
-            </div>
-          </div>
-          <div className="flex-1 bg-primary text-white rounded-xl p-4 flex items-center gap-3">
-            <Clock className="w-6 h-6" />
-            <div>
-              <p className="text-sm opacity-90">{assessment.duration}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 mb-4">
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-          <h3 className="font-bold text-primary mb-3">测评说明</h3>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {assessment.id === 'ppq' && (
-              <>
-                大学/高中生活就像一场打怪升级的游戏：DDL（截止日期）接踵而至、小组作业遇到"划水"队友、精心准备的比赛没拿奖、别人绩点高实习好让你疯狂"内耗"……
-                <br /><br />
-                面对这些暴击，有的人会一蹶不振，有的人却能迅速"残血复活"。这背后的秘密武器，就是你的「积极心理资本」。它不是测你有没有心理问题，而是测你内心储存了多少应对校园挑战的"硬核能量"。
-              </>
-            )}
-            {assessment.id === 'swls' && (
-              <>
-                朋友圈里，大家都在晒高分、晒旅游、晒甜甜的恋爱。看看别人，再看看自己，你可能会在深夜里怀疑："我的校园生活，真的算过得好吗？"
-                <br /><br />
-                其实，幸福从来不等于全系第一名，也不等于拿满所有奖学金。这是一个享誉全球的经典迷你测评，它只关心一件事：抛开老师、家长和同龄人的标准，在你自己的主观世界里，你对现在的状态接纳吗？你觉得开心吗？
-              </>
-            )}
-            {assessment.id === 'mlq' && (
-              <>
-                "我选这个专业到底是为了什么？""每天像个陀螺一样上课、去图书馆，但我真的喜欢这些吗？"
-                <br /><br />
-                如果你常常感到空虚，或者正在经历传说中的"青春期/大学迷茫"，不要慌，这是寻找自我的必经之路。这个测评不负责对你进行说教，而是帮你理清思绪：在人生的这片海域里，你现在是已经找到了航向，还是正在勇敢地四处探索？
-              </>
-            )}
-            {assessment.id === 'skus' && (
-              <>
-                校园里最让人感到挫败的，是总觉得自己"干啥啥不行，干饭第一名"。但心理学表明，每个人都有独特的性格优势。你觉得痛苦，往往是因为：你根本不知道自己擅长什么，或者你待错了圈子！
-                <br /><br />
-                比如，你明明是个擅长共情的"倾听者"，却非要逼自己在辩论赛里当个"攻击手"。这个测试专治各种"不知道自己有多棒"和"才华无处施展"，帮你把性格里的闪光点，变成现实生活中的通关密码！
-              </>
-            )}
-            {assessment.id === 'panas' && (
-              <>
-                期末考前一天，你可能同时感到"终于快考完放假了"的兴奋，和"这科复习不完肯定要挂了"的焦虑。人的情绪是很复杂的，绝不是非黑即白。
-                <br /><br />
-                这个量表就像是一台"情绪X光机"，它不追问你为什么不开心，只负责精准捕捉你最近这段时间，内心到底翻涌着怎样复杂的情感波浪。测完后生成的"情绪柱状图"，能帮你打破错觉，看见最真实的自己。
-              </>
-            )}
-            {assessment.id === 'ashs' && (
-              <>
-                心理学上的"希望"，可不是躺在宿舍床上祈祷"明天会更好"的阿Q精神，而是一种硬核的解题能力！
-                <br /><br />
-                当你在学校遇到突如其来的打击——比如熬夜写的论文被毙了、心仪的实习被鸽了、或者和好朋友大吵一架陷入冷战时，你是会原地摆烂，还是能迅速找到出路？本测评将一针见血地指出你的"破局短板"，教你在这个充满变数的校园里做个行动派！
-              </>
-            )}
-            {assessment.id === 'ers' && (
-              <>
-                学生时代，没人能躲过所有的坑。被老师当众批评、被同学孤立误解、连续的考试失利……决定我们能走多远的，往往不是我们避免了多少麻烦，而是我们遭遇重击后的"自我恢复能力"。
-                <br /><br />
-                你的心理是一块一碰就碎的玻璃，还是一根能屈能伸、被压得越低弹得越高的弹簧？通过这个测试，看看你的"心理防弹衣"有多厚。系统还会告诉你，如何通过后天的日常小事，把这根弹簧锻炼得越来越强大。
-              </>
-            )}
-            {assessment.id === 'erq' && (
-              <>
-                室友大半夜打游戏吵到你、考卷出得难到离谱……当委屈、愤怒或极度焦虑袭来时，你是怎么处理的？
-                <br /><br />
-                有的人习惯自我安慰"算了吧，就当锻炼心态了"；有的人则习惯表面波澜不惊，心里却在疯狂骂街。情绪管理没有绝对的好坏，但如果用错了场合，就会疯狂内耗。测测你潜意识里最依赖哪种"情绪灭火器"，系统会帮你诊断这种方式是不是正在让你变得更憋屈！
-              </>
-            )}
-            {assessment.id === 'rpws' && (
-              <>
-                逃课睡一整天、通宵打游戏确实能带来短暂的快乐，但在狂欢之后，常常伴随的是巨大的空虚感。真正的幸福和成长，是内心深处的一种"踏实感"。
-                <br /><br />
-                这是一个关注你"深度心理发育"的重量级量表。它将跳出成绩单的单一评价，全方位扫描你的心智成熟度。测完后生成的高能"六维雷达图"，会像高亮荧光笔一样，圈出你在成长路上的"优势项"，帮你告别同龄人内耗，找到大学里最充盈、自洽的从容状态。
-              </>
-            )}
-          </p>
-        </div>
-      </div>
-
-      <div className="px-4 mb-6">
-        <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-          <h3 className="font-bold text-secondary mb-3">测评维度</h3>
-          <div className="space-y-3">
-            {assessment.dimensions.map((dim) => (
-              <div key={dim.key} className="text-gray-600 text-sm">
-                <p className="font-medium text-gray-800 mb-1">
-                  {displayNames?.[dim.key] || dim.name}
-                </p>
-                {descriptions?.[dim.key] && (
-                  <p className="text-gray-500 leading-relaxed pl-2 border-l-2 border-orange-300">
-                    {descriptions[dim.key]}
-                  </p>
-                )}
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        <div className="px-4 mb-6">
+          <div className="flex gap-4">
+            <div className="flex-1 bg-primary text-white rounded-xl p-4 flex items-center gap-3">
+              <FileText className="w-6 h-6" />
+              <div>
+                <p className="text-sm opacity-90">共{assessment.questionCount}题</p>
               </div>
-            ))}
+            </div>
+            <div className="flex-1 bg-primary text-white rounded-xl p-4 flex items-center gap-3">
+              <Clock className="w-6 h-6" />
+              <div>
+                <p className="text-sm opacity-90">{assessment.duration}</p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-4 pb-8">
-        <button
-          onClick={handleStart}
-          className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-dark transition-colors active:scale-[0.98] transform"
-        >
-          开始测评
-        </button>
+        <div className="px-4 mb-4">
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+            <h3 className="font-bold text-primary mb-3">测评说明</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              {assessment.id === 'ppq' && (
+                <>
+                  大学/高中生活就像一场打怪升级的游戏：DDL（截止日期）接踵而至、小组作业遇到"划水"队友、精心准备的比赛没拿奖、别人绩点高实习好让你疯狂"内耗"……
+                  <br /><br />
+                  面对这些暴击，有的人会一蹶不振，有的人却能迅速"残血复活"。这背后的秘密武器，就是你的「积极心理资本」。它不是测你有没有心理问题，而是测你内心储存了多少应对校园挑战的"硬核能量"。
+                </>
+              )}
+              {assessment.id === 'swls' && (
+                <>
+                  朋友圈里，大家都在晒高分、晒旅游、晒甜甜的恋爱。看看别人，再看看自己，你可能会在深夜里怀疑："我的校园生活，真的算过得好吗？"
+                  <br /><br />
+                  其实，幸福从来不等于全系第一名，也不等于拿满所有奖学金。这是一个享誉全球的经典迷你测评，它只关心一件事：抛开老师、家长和同龄人的标准，在你自己的主观世界里，你对现在的状态接纳吗？你觉得开心吗？
+                </>
+              )}
+              {assessment.id === 'mlq' && (
+                <>
+                  "我选这个专业到底是为了什么？""每天像个陀螺一样上课、去图书馆，但我真的喜欢这些吗？"
+                  <br /><br />
+                  如果你常常感到空虚，或者正在经历传说中的"青春期/大学迷茫"，不要慌，这是寻找自我的必经之路。这个测评不负责对你进行说教，而是帮你理清思绪：在人生的这片海域里，你现在是已经找到了航向，还是正在勇敢地四处探索？
+                </>
+              )}
+              {assessment.id === 'skus' && (
+                <>
+                  校园里最让人感到挫败的，是总觉得自己"干啥啥不行，干饭第一名"。但心理学表明，每个人都有独特的性格优势。你觉得痛苦，往往是因为：你根本不知道自己擅长什么，或者你待错了圈子！
+                  <br /><br />
+                  比如，你明明是个擅长共情的"倾听者"，却非要逼自己在辩论赛里当个"攻击手"。这个测试专治各种"不知道自己有多棒"和"才华无处施展"，帮你把性格里的闪光点，变成现实生活中的通关密码！
+                </>
+              )}
+              {assessment.id === 'panas' && (
+                <>
+                  期末考前一天，你可能同时感到"终于快考完放假了"的兴奋，和"这科复习不完肯定要挂了"的焦虑。人的情绪是很复杂的，绝不是非黑即白。
+                  <br /><br />
+                  这个量表就像是一台"情绪X光机"，它不追问你为什么不开心，只负责精准捕捉你最近这段时间，内心到底翻涌着怎样复杂的情感波浪。测完后生成的"情绪柱状图"，能帮你打破错觉，看见最真实的自己。
+                </>
+              )}
+              {assessment.id === 'ashs' && (
+                <>
+                  心理学上的"希望"，可不是躺在宿舍床上祈祷"明天会更好"的阿Q精神，而是一种硬核的解题能力！
+                  <br /><br />
+                  当你在学校遇到突如其来的打击——比如熬夜写的论文被毙了、心仪的实习被鸽了、或者和好朋友大吵一架陷入冷战时，你是会原地摆烂，还是能迅速找到出路？本测评将一针见血地指出你的"破局短板"，教你在这个充满变数的校园里做个行动派！
+                </>
+              )}
+              {assessment.id === 'ers' && (
+                <>
+                  学生时代，没人能躲过所有的坑。被老师当众批评、被同学孤立误解、连续的考试失利……决定我们能走多远的，往往不是我们避免了多少麻烦，而是我们遭遇重击后的"自我恢复能力"。
+                  <br /><br />
+                  你的心理是一块一碰就碎的玻璃，还是一根能屈能伸、被压得越低弹得越高的弹簧？通过这个测试，看看你的"心理防弹衣"有多厚。系统还会告诉你，如何通过后天的日常小事，把这根弹簧锻炼得越来越强大。
+                </>
+              )}
+              {assessment.id === 'erq' && (
+                <>
+                  室友大半夜打游戏吵到你、考卷出得难到离谱……当委屈、愤怒或极度焦虑袭来时，你是怎么处理的？
+                  <br /><br />
+                  有的人习惯自我安慰"算了吧，就当锻炼心态了"；有的人则习惯表面波澜不惊，心里却在疯狂骂街。情绪管理没有绝对的好坏，但如果用错了场合，就会疯狂内耗。测测你潜意识里最依赖哪种"情绪灭火器"，系统会帮你诊断这种方式是不是正在让你变得更憋屈！
+                </>
+              )}
+              {assessment.id === 'rpws' && (
+                <>
+                  逃课睡一整天、通宵打游戏确实能带来短暂的快乐，但在狂欢之后，常常伴随的是巨大的空虚感。真正的幸福和成长，是内心深处的一种"踏实感"。
+                  <br /><br />
+                  这是一个关注你"深度心理发育"的重量级量表。它将跳出成绩单的单一评价，全方位扫描你的心智成熟度。测完后生成的高能"六维雷达图"，会像高亮荧光笔一样，圈出你在成长路上的"优势项"，帮你告别同龄人内耗，找到大学里最充盈、自洽的从容状态。
+                </>
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="px-4 mb-6">
+          <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+            <h3 className="font-bold text-secondary mb-3">测评维度</h3>
+            <div className="space-y-3">
+              {assessment.dimensions.map((dim) => (
+                <div key={dim.key} className="text-gray-600 text-sm">
+                  <p className="font-medium text-gray-800 mb-1">
+                    {displayNames?.[dim.key] || dim.name}
+                  </p>
+                  {descriptions?.[dim.key] && (
+                    <p className="text-gray-500 leading-relaxed pl-2 border-l-2 border-orange-300">
+                      {descriptions[dim.key]}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 pb-8">
+          <button
+            onClick={handleStart}
+            className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-dark transition-colors active:scale-[0.98] transform"
+          >
+            开始测评
+          </button>
+        </div>
       </div>
     </div>
   );

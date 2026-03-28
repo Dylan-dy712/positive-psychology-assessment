@@ -78,7 +78,7 @@ export const FeedbackPage = () => {
 
   return (
     <div className="page-container">
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 text-primary font-medium hover:opacity-80 transition-opacity"
@@ -90,33 +90,37 @@ export const FeedbackPage = () => {
 
       <div className="px-4 pb-6">
         <h1 className="text-xl font-bold text-primary mb-6 text-center">帮助与反馈</h1>
+      </div>
 
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('faq')}
-            className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeTab === 'faq' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            常见问题
-          </button>
-          <button
-            onClick={() => setActiveTab('submit')}
-            className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeTab === 'submit' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            意见反馈
-          </button>
-          <button
-            onClick={() => setActiveTab('history')}
-            className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
-              activeTab === 'history' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            历史反馈
-          </button>
-        </div>
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        <div className="px-4 pb-6">
+          <div className="flex gap-2 mb-6">
+            <button
+              onClick={() => setActiveTab('faq')}
+              className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'faq' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              常见问题
+            </button>
+            <button
+              onClick={() => setActiveTab('submit')}
+              className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'submit' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              意见反馈
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
+                activeTab === 'history' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              历史反馈
+            </button>
+          </div>
 
         {activeTab === 'faq' && (
           <div className="space-y-3">
@@ -192,6 +196,7 @@ export const FeedbackPage = () => {
             )}
           </div>
         )}
+        </div>
       </div>
 
       <Toast

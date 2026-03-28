@@ -53,7 +53,7 @@ export const AccountPage = () => {
 
   return (
     <div className="page-container pb-24">
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 text-primary font-medium hover:opacity-80 transition-opacity"
@@ -65,127 +65,132 @@ export const AccountPage = () => {
 
       <div className="px-4 pb-6">
         <h1 className="text-xl font-bold text-primary mb-6 text-center">账号信息</h1>
+      </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
-          <div className="flex flex-col items-center">
-            <img
-              src={avatar}
-              alt="头像"
-              className="w-24 h-24 rounded-full object-cover mb-3"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden"
-              id="avatar-input"
-            />
-            <label
-              htmlFor="avatar-input"
-              className="text-primary text-sm font-medium cursor-pointer"
-            >
-              更换头像
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-gray-600 text-sm mb-2">昵称</label>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary"
-              placeholder="请输入昵称"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-600 text-sm mb-2">年龄</label>
-            <input
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary"
-              placeholder="请输入年龄"
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-600 text-sm mb-2">性别</label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setGender('male')}
-                className={`flex-1 py-3 rounded-xl border-2 transition-colors ${
-                  gender === 'male'
-                    ? 'border-primary text-primary'
-                    : 'border-gray-200 text-gray-600'
-                }`}
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        <div className="px-4 pb-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm space-y-6">
+            <div className="flex flex-col items-center">
+              <img
+                src={avatar}
+                alt="头像"
+                className="w-24 h-24 rounded-full object-cover mb-3"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="hidden"
+                id="avatar-input"
+              />
+              <label
+                htmlFor="avatar-input"
+                className="text-primary text-sm font-medium cursor-pointer"
               >
-                男
-              </button>
-              <button
-                onClick={() => setGender('female')}
-                className={`flex-1 py-3 rounded-xl border-2 transition-colors ${
-                  gender === 'female'
-                    ? 'border-primary text-primary'
-                    : 'border-gray-200 text-gray-600'
-                }`}
-              >
-                女
-              </button>
+                更换头像
+              </label>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-gray-600 text-sm mb-2">学段</label>
-            <div className="flex flex-wrap gap-2">
-              {schoolStages.map((stage) => (
+            <div>
+              <label className="block text-gray-600 text-sm mb-2">昵称</label>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary"
+                placeholder="请输入昵称"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-600 text-sm mb-2">年龄</label>
+              <input
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-primary"
+                placeholder="请输入年龄"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-600 text-sm mb-2">性别</label>
+              <div className="flex gap-3">
                 <button
-                  key={stage}
-                  onClick={() => {
-                    setSchoolStage(stage);
-                    setGrade('');
-                  }}
-                  className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                    schoolStage === stage
-                      ? 'bg-primary text-white'
-                      : 'bg-gray-100 text-gray-600'
+                  onClick={() => setGender('male')}
+                  className={`flex-1 py-3 rounded-xl border-2 transition-colors ${
+                    gender === 'male'
+                      ? 'border-primary text-primary'
+                      : 'border-gray-200 text-gray-600'
                   }`}
                 >
-                  {stage}
+                  男
                 </button>
-              ))}
+                <button
+                  onClick={() => setGender('female')}
+                  className={`flex-1 py-3 rounded-xl border-2 transition-colors ${
+                    gender === 'female'
+                      ? 'border-primary text-primary'
+                      : 'border-gray-200 text-gray-600'
+                  }`}
+                >
+                  女
+                </button>
+              </div>
             </div>
-          </div>
 
-          {schoolStage && (
             <div>
-              <label className="block text-gray-600 text-sm mb-2">年级</label>
+              <label className="block text-gray-600 text-sm mb-2">学段</label>
               <div className="flex flex-wrap gap-2">
-                {gradesByStage[schoolStage].map((g) => (
+                {schoolStages.map((stage) => (
                   <button
-                    key={g}
-                    onClick={() => setGrade(g)}
+                    key={stage}
+                    onClick={() => {
+                      setSchoolStage(stage);
+                      setGrade('');
+                    }}
                     className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                      grade === g
+                      schoolStage === stage
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-gray-600'
                     }`}
                   >
-                    {g}
+                    {stage}
                   </button>
                 ))}
               </div>
             </div>
-          )}
-        </div>
 
-        <button
-          onClick={handleSave}
-          className="w-full mt-6 py-4 bg-primary text-white rounded-full font-bold text-lg"
-        >
-          保存
-        </button>
+            {schoolStage && (
+              <div>
+                <label className="block text-gray-600 text-sm mb-2">年级</label>
+                <div className="flex flex-wrap gap-2">
+                  {gradesByStage[schoolStage].map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => setGrade(g)}
+                      className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                        grade === g
+                          ? 'bg-primary text-white'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleSave}
+            className="w-full mt-6 py-4 bg-primary text-white rounded-full font-bold text-lg"
+          >
+            保存
+          </button>
+        </div>
       </div>
 
       <Toast

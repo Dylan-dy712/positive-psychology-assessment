@@ -180,7 +180,7 @@ export const ReportPage = () => {
   return (
     <div className="page-container pb-32">
       {/* 头部 */}
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <button
           onClick={handleBack}
           className="flex items-center gap-1 text-primary font-medium hover:opacity-80 transition-opacity"
@@ -198,56 +198,59 @@ export const ReportPage = () => {
         <h2 className="text-lg font-bold text-gray-800 mt-2">测评报告</h2>
       </div>
 
-      {/* 图表区域 */}
-      <div className="px-4 mb-6">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          {renderChart()}
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        {/* 图表区域 */}
+        <div className="px-4 mb-6">
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            {renderChart()}
+          </div>
         </div>
-      </div>
 
-      {/* 测评解读 */}
-      <div className="px-4 mb-4">
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
-          <h3 className="font-bold text-primary mb-4">测评解读</h3>
-          <div className="space-y-4">
-            {assessment.dimensions.map((dim) => {
-              const score = record.scores[dim.key];
-              const interpretation = getInterpretation(dim.key, score);
-              return (
-                <div key={dim.key}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-gray-800">
-                      {dim.name}
-                    </span>
-                    <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
-                      {score}分
-                    </span>
+        {/* 测评解读 */}
+        <div className="px-4 mb-4">
+          <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+            <h3 className="font-bold text-primary mb-4">测评解读</h3>
+            <div className="space-y-4">
+              {assessment.dimensions.map((dim) => {
+                const score = record.scores[dim.key];
+                const interpretation = getInterpretation(dim.key, score);
+                return (
+                  <div key={dim.key}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-gray-800">
+                        {dim.name}
+                      </span>
+                      <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
+                        {score}分
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      {interpretation}
+                    </p>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {interpretation}
-                  </p>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 建议小tips */}
-      <div className="px-4 mb-6">
-        <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-          <h3 className="font-bold text-secondary mb-3">建议小tips</h3>
-          <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-            {getSuggestion()}
+        {/* 建议小tips */}
+        <div className="px-4 mb-6">
+          <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
+            <h3 className="font-bold text-secondary mb-3">建议小tips</h3>
+            <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+              {getSuggestion()}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 免责声明 */}
-      <div className="px-4 pb-8">
-        <div className="text-center text-gray-400 text-xs space-y-1">
-          <p>本测评结果仅供参考，不能替代专业心理诊断或医疗建议。</p>
-          <p>如有严重情绪困扰，请寻求专业心理咨询师或医生的帮助。</p>
+        {/* 免责声明 */}
+        <div className="px-4 pb-8">
+          <div className="text-center text-gray-400 text-xs space-y-1">
+            <p>本测评结果仅供参考，不能替代专业心理诊断或医疗建议。</p>
+            <p>如有严重情绪困扰，请寻求专业心理咨询师或医生的帮助。</p>
+          </div>
         </div>
       </div>
     </div>

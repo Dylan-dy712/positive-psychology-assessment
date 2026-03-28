@@ -17,7 +17,7 @@ export const EmojiPage = () => {
 
   return (
     <div className="page-container">
-      <div className="sticky top-0 bg-background z-10 px-4 py-4">
+      <div className="sticky top-0 z-10 px-4 py-4">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-1 text-primary font-medium hover:opacity-80 transition-opacity"
@@ -29,24 +29,29 @@ export const EmojiPage = () => {
 
       <div className="px-4 pb-6">
         <h1 className="text-xl font-bold text-primary mb-6 text-center">朋辈系列表情包</h1>
+      </div>
 
-        <div className="space-y-4">
-          {emojiPackages.map((pkg) => (
-            <div key={pkg.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img src={pkg.image} alt={pkg.name} className="w-20 h-20 rounded-lg object-cover" />
-                <div>
-                  <p className="font-medium text-gray-800">{pkg.name}</p>
+      {/* 白色内容区域 */}
+      <div className="bg-white rounded-t-[24px] min-h-[calc(100vh-180px)] pt-6">
+        <div className="px-4 pb-6">
+          <div className="space-y-4">
+            {emojiPackages.map((pkg) => (
+              <div key={pkg.id} className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <img src={pkg.image} alt={pkg.name} className="w-20 h-20 rounded-lg object-cover" />
+                  <div>
+                    <p className="font-medium text-gray-800">{pkg.name}</p>
+                  </div>
                 </div>
+                <button
+                  onClick={() => setSelectedPackage(pkg)}
+                  className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium"
+                >
+                  获取
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedPackage(pkg)}
-                className="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium"
-              >
-                获取
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
