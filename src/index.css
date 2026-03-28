@@ -14,8 +14,12 @@
   }
   
   body {
-    background: linear-gradient(180deg, #DFF6F0 0%, #F0FBF8 30%, #FFFFFF 100%);
+    background-image: url('/background.png');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
     background-attachment: fixed;
+    background-color: #ffffff;
     color: #1F2937;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
