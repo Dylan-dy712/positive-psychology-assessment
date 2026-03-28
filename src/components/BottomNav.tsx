@@ -9,8 +9,15 @@ export const BottomNav = () => {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t-2 border-blue-500 shadow-lg z-[100]"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className="fixed bottom-0 left-0 right-0 border-t-2 border-blue-500 shadow-lg z-[100]"
+      style={{ 
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        backgroundImage: 'url(/background.png)',
+        backgroundSize: '100% auto',
+        backgroundPosition: 'center top',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
     >
       <div className="flex w-full max-w-md mx-auto">
         <button
