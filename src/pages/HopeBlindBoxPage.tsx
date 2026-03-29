@@ -42,7 +42,7 @@ export const HopeBlindBoxPage = () => {
           onClick={() => navigate('/mental-save/hope-blind-box/memoirs')}
           className="flex flex-col items-center gap-1 p-2"
         >
-          <img src="/positive-psychology-assessment/assets/mhhyl.png" alt="盲盒回忆录" className="w-12 h-12 object-contain drop-shadow-lg" />
+          <img src="/positive-psychology-assessment/assets/mhhyl.png" alt="盲盒回忆录" className="w-36 h-36 object-contain drop-shadow-lg" />
           <span className="text-sm font-medium text-white drop-shadow-md">盲盒回忆录</span>
         </button>
       </div>

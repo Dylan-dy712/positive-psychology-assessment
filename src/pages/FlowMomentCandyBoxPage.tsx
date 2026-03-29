@@ -95,7 +95,7 @@ export const FlowMomentCandyBoxPage = () => {
         </div>
 
         <div 
-          className="w-48 h-48 bg-pink-100 rounded-2xl flex items-center justify-center cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
+          className="w-80 h-80 bg-pink-100 rounded-2xl flex items-center justify-center cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
           onClick={handleBoxClick}
           style={{ 
             background: 'linear-gradient(135deg, #FFB6C1 0%, #FFC0CB 100%)',
@@ -103,7 +103,7 @@ export const FlowMomentCandyBoxPage = () => {
           }}
         >
           <div className="text-center">
-            <div className="text-4xl font-bold text-pink-600">🍬</div>
+            <img src="/positive-psychology-assessment/assets/tangguohe.png" alt="糖果盒" className="w-56 h-56 object-contain mx-auto" />
             <p className="mt-2 text-pink-600 font-medium">糖果盒</p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export const FlowMomentCandyBoxPage = () => {
             className="mt-10 cursor-pointer animate-bounce"
             onClick={handleCandyClick}
           >
-            <div className="text-6xl">🍭</div>
+            <img src="/positive-psychology-assessment/assets/tangguo.png" alt="糖果" className="w-44 h-44 object-contain" />
           </div>
         )}
 

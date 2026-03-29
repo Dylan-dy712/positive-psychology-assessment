@@ -21,14 +21,14 @@ export const FlowMomentPage = () => {
             onClick={() => navigate('/mental-save/flow-moment/portrait')}
             className="flex flex-col items-center gap-1 p-1"
           >
-            <img src="/positive-psychology-assessment/assets/xlhx.png" alt="心流画像" className="w-10 h-10 object-contain drop-shadow-lg" />
+            <img src="/positive-psychology-assessment/assets/xlhx.png" alt="心流画像" className="w-28 h-28 object-contain drop-shadow-lg" />
             <span className="text-xs font-medium text-white drop-shadow-md">心流画像</span>
           </button>
           <button 
             onClick={() => navigate('/mental-save/flow-moment/candy-box')}
             className="flex flex-col items-center gap-1 p-1"
           >
-            <img src="/positive-psychology-assessment/assets/tgh.png" alt="糖果盒" className="w-10 h-10 object-contain drop-shadow-lg" />
+            <img src="/positive-psychology-assessment/assets/tangguohe.png" alt="糖果盒" className="w-28 h-28 object-contain drop-shadow-lg" />
             <span className="text-xs font-medium text-white drop-shadow-md">糖果盒</span>
           </button>
         </div>

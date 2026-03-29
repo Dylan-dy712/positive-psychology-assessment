@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
-import { updateCoinBalance, updateDailyRewards, getDailyRewards, getCoinBalance } from '../utils/storage';
+import { getCoinBalance, updateCoinBalance } from '../utils/storage';
 
 export const HeartScratchGamePage = () => {
   const navigate = useNavigate();

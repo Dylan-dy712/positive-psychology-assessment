@@ -161,7 +161,7 @@ export const GratitudeCalendarPage = () => {
                     <div className="relative flex flex-col items-center">
                       {date.getDate()}
                       {hasDiaryEntry && (
-                        <img src="/positive-psychology-assessment/assets/aixin.svg" alt="有记录" className="w-4 h-3.5 mt-1" />
+                        <img src="/positive-psychology-assessment/assets/aixin.svg" alt="有记录" className="w-6 h-5 mt-1" />
                       )}
                     </div>
                   </button>

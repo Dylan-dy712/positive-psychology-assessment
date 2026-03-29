@@ -20,7 +20,7 @@ export const GratitudeDiaryPage = () => {
           onClick={() => navigate('/mental-save/gratitude-diary/calendar')}
           className="flex flex-col items-center gap-1 p-2"
         >
-          <img src="/positive-psychology-assessment/assets/ganenrili.png" alt="感恩日历" className="w-12 h-12 object-contain drop-shadow-lg" />
+          <img src="/positive-psychology-assessment/assets/ganenrili.png" alt="感恩日历" className="w-36 h-36 object-contain drop-shadow-lg" />
           <span className="text-sm font-medium text-white drop-shadow-md">感恩日历</span>
         </button>
       </div>

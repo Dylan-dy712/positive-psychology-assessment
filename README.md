@@ -1,4 +1,4 @@
-# 心智小程序 - 积极心理测评平台
+# 心智 - 积极心理成长平台
 
 基于 React 18 + TypeScript + Tailwind CSS 开发的移动端 H5 心理测评应用。
 

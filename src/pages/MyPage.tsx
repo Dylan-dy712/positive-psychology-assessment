@@ -147,13 +147,13 @@ export const MyPage = () => {
               onClick={() => navigate('/agreement/service')}
               className="text-primary font-medium mx-1 cursor-pointer"
             >
-              《心智小程序用户服务协议》
+              《心智用户服务协议》
             </span>
             <span
               onClick={() => navigate('/agreement/privacy')}
               className="text-primary font-medium mx-1 cursor-pointer"
             >
-              《心智小程序隐私保护政策》
+              《心智隐私保护政策》
             </span>
           </p>
         </div>
