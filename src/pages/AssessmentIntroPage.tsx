@@ -1,7 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, FileText, Clock } from 'lucide-react';
-import { getAssessmentById } from '../data/assessments';
-import { clearAssessmentProgress } from '../utils/storage';
+import { useState } from 'react';
+import { ChevronLeft, FileText, Clock, Coins } from 'lucide-react';
+import { getAssessmentById, assessments } from '../data/assessments';
+import { clearAssessmentProgress, updateCoinBalance, getAssessmentRecords } from '../utils/storage';
 
 const dimensionDescriptions: Record<string, Record<string, string>> = {
   ppq: {
@@ -89,20 +90,108 @@ const dimensionDisplayNames: Record<string, Record<string, string>> = {
   },
 };
 
+// 检查用户当月是否已使用免费机会
+const hasFreeMonthlyAssessment = (assessmentId: string): boolean => {
+  if (!assessmentId || assessmentId === 'ppq') return true; // PPQ始终免费
+  
+  const assessment = assessments.find(a => a.id === assessmentId);
+  if (!assessment || !assessment.freeMonthly) return false; // 无免费机会
+  
+  const records = getAssessmentRecords();
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const thisMonthRecords = records.filter(record => {
+    if (record.assessmentId !== assessmentId) return false;
+    const recordDate = new Date(record.completedAt);
+    return recordDate.getMonth() === currentMonth && recordDate.getFullYear() === currentYear;
+  });
+  
+  return thisMonthRecords.length === 0;
+};
+
 export const AssessmentIntroPage = () => {
   const navigate = useNavigate();
   const { assessmentId } = useParams<{ assessmentId: string }>();
   const assessment = assessmentId ? getAssessmentById(assessmentId) : undefined;
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showInsufficientModal, setShowInsufficientModal] = useState(false);
+  const [coinCost, setCoinCost] = useState(0);
 
   const handleBack = () => {
     navigate('/assessments');
   };
 
+  // 获取价格显示文本
+  const getPriceText = (): string => {
+    if (!assessment) return '';
+    if (assessment.id === 'ppq') {
+      return '免费';
+    }
+    if (assessment.freeMonthly) {
+      const hasFree = hasFreeMonthlyAssessment(assessment.id);
+      if (hasFree) {
+        return '本月首次免费';
+      } else {
+        return `${assessment.price}心理货币`;
+      }
+    }
+    return `${assessment.price}心理货币`;
+  };
+
+  // 获取价格标签样式
+  const getPriceStyle = (): string => {
+    if (!assessment) return '';
+    if (assessment.id === 'ppq') {
+      return 'bg-green-100 text-green-600';
+    }
+    if (assessment.freeMonthly) {
+      const hasFree = hasFreeMonthlyAssessment(assessment.id);
+      if (hasFree) {
+        return 'bg-green-100 text-green-600';
+      } else {
+        return 'bg-orange-100 text-orange-600';
+      }
+    }
+    return 'bg-orange-100 text-orange-600';
+  };
+
   const handleStart = () => {
-    if (assessmentId) {
+    if (!assessmentId || !assessment) return;
+    
+    // 检查是否有免费机会
+    const hasFree = hasFreeMonthlyAssessment(assessmentId);
+    
+    if (hasFree) {
+      // 有免费机会，直接进入测评
       clearAssessmentProgress(assessmentId);
       navigate(`/assessment/${assessmentId}/quiz`);
+    } else {
+      // 需要付费
+      const cost = assessment.price;
+      setCoinCost(cost);
+      setShowConfirmModal(true);
     }
+  };
+
+  const handleConfirmExchange = () => {
+    if (!assessmentId || !assessment) return;
+    
+    const success = updateCoinBalance(-coinCost, `兑换${assessment.name}测评`);
+    if (success) {
+      setShowConfirmModal(false);
+      clearAssessmentProgress(assessmentId);
+      navigate(`/assessment/${assessmentId}/quiz`);
+    } else {
+      setShowConfirmModal(false);
+      setShowInsufficientModal(true);
+    }
+  };
+
+  const handleCloseModals = () => {
+    setShowConfirmModal(false);
+    setShowInsufficientModal(false);
   };
 
   if (!assessment) {
@@ -123,6 +212,7 @@ export const AssessmentIntroPage = () => {
 
   const descriptions = assessmentId ? dimensionDescriptions[assessmentId] : {};
   const displayNames = assessmentId ? dimensionDisplayNames[assessmentId] : {};
+  const hasFree = hasFreeMonthlyAssessment(assessmentId || '');
 
   return (
     <div className="page-container">
@@ -158,6 +248,34 @@ export const AssessmentIntroPage = () => {
                 <p className="text-sm opacity-90">{assessment.duration}</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* 价格信息卡片 */}
+        <div className="px-4 mb-6">
+          <div className={`rounded-xl p-4 border ${getPriceStyle()} border-current`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Coins className="w-5 h-5" />
+                <span className="font-bold">测评价格</span>
+              </div>
+              <span className="text-lg font-bold">{getPriceText()}</span>
+            </div>
+            {assessment.id !== 'ppq' && assessment.freeMonthly && hasFree && (
+              <p className="text-xs mt-2 opacity-80">
+                每月首次测评免费，之后需{assessment.price}心理货币兑换
+              </p>
+            )}
+            {assessment.id !== 'ppq' && assessment.freeMonthly && !hasFree && (
+              <p className="text-xs mt-2 opacity-80">
+                本月免费次数已用完，需消耗心理货币兑换
+              </p>
+            )}
+            {assessment.id !== 'ppq' && !assessment.freeMonthly && (
+              <p className="text-xs mt-2 opacity-80">
+                该量表无免费机会，每次测评需消耗心理货币兑换
+              </p>
+            )}
           </div>
         </div>
 
@@ -257,10 +375,54 @@ export const AssessmentIntroPage = () => {
             onClick={handleStart}
             className="w-full bg-primary text-white py-4 rounded-full font-bold text-lg shadow-lg hover:bg-primary-dark transition-colors active:scale-[0.98] transform"
           >
-            开始测评
+            {hasFree ? '开始测评' : `消耗 ${assessment.price} 心理货币开始测评`}
           </button>
         </div>
       </div>
+
+      {/* 确认兑换弹窗 */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+            <h3 className="text-xl font-bold text-center mb-4">兑换测评</h3>
+            <p className="text-center text-gray-700 mb-6">
+              该量表需{coinCost}个心理货币兑换，是否要兑换？
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={handleCloseModals}
+                className="flex-1 py-3 border border-gray-300 rounded-full text-gray-700 font-medium"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleConfirmExchange}
+                className="flex-1 py-3 bg-primary text-white rounded-full font-medium"
+              >
+                兑换
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 余额不足弹窗 */}
+      {showInsufficientModal && (
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md">
+            <h3 className="text-xl font-bold text-center mb-4">提示</h3>
+            <p className="text-center text-gray-700 mb-6">
+              您的心理货币不足，请先完成日常任务获取心理货币
+            </p>
+            <button
+              onClick={handleCloseModals}
+              className="w-full py-3 bg-primary text-white rounded-full font-medium"
+            >
+              确定
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

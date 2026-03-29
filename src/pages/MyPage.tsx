@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { getUserData, getAssetPath } from '../utils/user';
+import { getCoinBalance } from '../utils/storage';
 import { Toast } from '../components/Toast';
 import { useState } from 'react';
 
 export const MyPage = () => {
   const navigate = useNavigate();
   const userData = getUserData();
+  const coinBalance = getCoinBalance();
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
 
@@ -34,21 +36,34 @@ export const MyPage = () => {
           </p>
         </div>
 
+        {/* 心理货币余额区 */}
         <div className="px-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={getAssetPath('xinlihuobi.svg')} alt="心理货币" className="w-8 h-8" />
-              <div>
-                <p className="text-gray-500 text-sm">我的心理货币</p>
-                <p className="text-2xl font-bold text-primary">{userData.coinBalance}枚</p>
+          <div className="p-6 bg-[#6B55FF] rounded-xl shadow-md">
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <img src="/positive-psychology-assessment/assets/xinlihuobi.svg" alt="心理货币" className="w-8 h-8" />
+                  <span className="font-bold text-white">我的心理货币</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-3xl font-bold text-white">{coinBalance} 枚</div>
+                <div className="flex flex-col gap-2">
+                  <button 
+                    onClick={() => navigate('/mental-save/coin-guide')}
+                    className="px-4 py-1 bg-white text-[#6B55FF] rounded-full text-sm font-medium"
+                  >
+                    获取攻略
+                  </button>
+                  <button 
+                    onClick={() => navigate('/my/coin-detail')}
+                    className="px-4 py-1 bg-white text-[#6B55FF] rounded-full text-sm font-medium"
+                  >
+                    明细
+                  </button>
+                </div>
               </div>
             </div>
-            <button
-              onClick={() => navigate('/my/coin-detail')}
-              className="text-primary text-sm font-medium"
-            >
-              明细
-            </button>
           </div>
         </div>
 

@@ -29,7 +29,7 @@ export const LaunchPage = () => {
       <img src={getAssetPath('startPage.png')} alt="启动页" className="w-full h-full object-cover" />
       
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <h3 className="text-lg font-bold text-gray-800 mb-4">欢迎使用心智小程序！</h3>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">

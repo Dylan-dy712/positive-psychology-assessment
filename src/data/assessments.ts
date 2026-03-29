@@ -41,6 +41,8 @@ export interface Assessment {
     text: string;
   }[];
   chartType: 'radar' | 'linear' | 'scatter' | 'bar' | 'horizontalBar' | 'pie';
+  price: number;
+  freeMonthly: boolean;
 }
 
 export const assessments: Assessment[] = [
@@ -155,6 +157,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'radar',
+    price: 0,
+    freeMonthly: true,
   },
   {
     id: 'swls',
@@ -230,6 +234,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'linear',
+    price: 99,
+    freeMonthly: true,
   },
   {
     id: 'mlq',
@@ -303,6 +309,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'scatter',
+    price: 169,
+    freeMonthly: true,
   },
   {
     id: 'skus',
@@ -387,6 +395,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'bar',
+    price: 299,
+    freeMonthly: true,
   },
   {
     id: 'panas',
@@ -468,6 +478,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'horizontalBar',
+    price: 288,
+    freeMonthly: false,
   },
   {
     id: 'ashs',
@@ -538,6 +550,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'horizontalBar',
+    price: 99,
+    freeMonthly: false,
   },
   {
     id: 'ers',
@@ -604,6 +618,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'linear',
+    price: 199,
+    freeMonthly: false,
   },
   {
     id: 'erq',
@@ -677,6 +693,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'pie',
+    price: 169,
+    freeMonthly: false,
   },
   {
     id: 'rpws',
@@ -793,6 +811,8 @@ export const assessments: Assessment[] = [
       },
     ],
     chartType: 'radar',
+    price: 288,
+    freeMonthly: false,
   },
 ];
 

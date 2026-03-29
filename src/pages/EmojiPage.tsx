@@ -56,7 +56,7 @@ export const EmojiPage = () => {
       </div>
 
       {selectedPackage && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-gray-800">扫描二维码获取</h3>

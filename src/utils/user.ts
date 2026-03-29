@@ -21,6 +21,7 @@ export interface CoinRecord {
   amount: number;
   description: string;
   date: string;
+  balanceAfter?: number; // 交易后的余额
 }
 
 export interface FeedbackRecord {
@@ -75,21 +76,23 @@ export const getCoinRecords = (): CoinRecord[] => {
   }
 };
 
-export const addCoinRecord = (record: Omit<CoinRecord, 'id' | 'date'>): CoinRecord => {
+export const addCoinRecord = (record: Omit<CoinRecord, 'id' | 'date' | 'balanceAfter'>): CoinRecord => {
   try {
     const records = getCoinRecords();
-    const newRecord: CoinRecord = {
-      ...record,
-      id: Date.now().toString(),
-      date: new Date().toISOString(),
-    };
-    records.unshift(newRecord);
-    localStorage.setItem(COIN_RECORDS_KEY, JSON.stringify(records));
-    
     const userData = getUserData();
     const newBalance = record.type === 'earn' 
       ? userData.coinBalance + record.amount
       : userData.coinBalance - record.amount;
+    
+    const newRecord: CoinRecord = {
+      ...record,
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      balanceAfter: newBalance,
+    };
+    records.unshift(newRecord);
+    localStorage.setItem(COIN_RECORDS_KEY, JSON.stringify(records));
+    
     saveUserData({ coinBalance: newBalance });
     
     return newRecord;

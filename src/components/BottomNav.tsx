@@ -5,7 +5,15 @@ export const BottomNav = () => {
   const location = useLocation();
 
   const isMentalFileActive = location.pathname === '/' || location.pathname === '/history';
+  const isMentalSaveActive = location.pathname === '/mental-save' || location.pathname.startsWith('/mental-save/');
   const isMyActive = location.pathname === '/my' || location.pathname.startsWith('/my/');
+
+  const showBottomNav = 
+    isMentalFileActive || 
+    isMentalSaveActive || 
+    isMyActive;
+
+  if (!showBottomNav) return null;
 
   return (
     <div 
@@ -25,6 +33,19 @@ export const BottomNav = () => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span className="text-xs sm:text-sm font-bold">心灵档案</span>
+        </button>
+        <button
+          onClick={() => navigate('/mental-save')}
+          className={`flex-1 py-3 sm:py-4 flex flex-col items-center gap-1 transition-colors min-h-[56px] ${
+            isMentalSaveActive ? 'text-blue-600 bg-blue-50' : 'text-gray-500 hover:bg-gray-50'
+          }`}
+        >
+          <img 
+            src={`/positive-psychology-assessment/assets/${isMentalSaveActive ? 'xlcxxz.svg' : 'xlcxwx.svg'}`} 
+            alt="心理储蓄" 
+            className="w-6 h-6 sm:w-7 sm:h-7"
+          />
+          <span className="text-xs sm:text-sm font-bold">心理储蓄</span>
         </button>
         <button
           onClick={() => navigate('/my')}

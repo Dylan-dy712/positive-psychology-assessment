@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>心渊猎手 - Mind Abyss Hunter</title>
+    <style>
+        /* 黑暗心渊主题 */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+            background-color: #050508; font-family: 'PingFang SC', sans-serif;
+            color: #fff; touch-action: none; user-select: none;
+        }
+
+        #gameCanvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        /* UI 通用层 */
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20; background: rgba(5, 5, 8, 0.85); backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+        .hidden { opacity: 0; pointer-events: none; }
+
+        /* 顶部状态栏 */
+        #hud {
+            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: none;
+        }
+        .hud-text { font-size: 18px; font-weight: bold; text-shadow: 0 2px 5px #000; }
+        
+        /* 经验条 */
+        #xp-bar-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 8px;
+            background: rgba(255,255,255,0.1); z-index: 10;
+        }
+        #xp-bar { height: 100%; width: 0%; background: #f1c40f; transition: width 0.2s; box-shadow: 0 0 10px #f1c40f; }
+
+        /* 菜单卡片 */
+        .menu-card {
+            background: linear-gradient(135deg, #1e272e 0%, #0b1014 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            padding: 40px 30px; text-align: center; width: 80%; max-width: 350px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .menu-card h1 { color: #00d2d3; letter-spacing: 2px; margin-top: 0; text-shadow: 0 0 15px rgba(0, 210, 211, 0.5); }
+        .menu-card p { color: #8395a5; font-size: 14px; line-height: 1.6; }
+
+        .btn {
+            background: transparent; color: #00d2d3; border: 2px solid #00d2d3;
+            padding: 15px 30px; border-radius: 30px; font-size: 16px; font-weight: bold;
+            cursor: pointer; width: 100%; margin-top: 20px; transition: 0.2s;
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.2);
+        }
+        .btn:active { transform: scale(0.95); background: rgba(0, 210, 211, 0.2); }
+
+        /* 升级卡片 */
+        .cards-container { display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 400px; }
+        .upgrade-card {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px; padding: 20px; display: flex; align-items: center;
+            cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+        }
+        .upgrade-card:active { transform: scale(0.95); border-color: #f1c40f; }
+        .upgrade-icon { font-size: 30px; margin-right: 15px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+        .upgrade-info { text-align: left; }
+        .upgrade-name { font-size: 18px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
+        .upgrade-desc { font-size: 12px; color: #a4b0be; }
+
+        /* Boss 警告遮罩 */
+        #boss-warning {
+            position: absolute; top: 25%; width: 100%; text-align: center; z-index: 15;
+            font-size: 30px; font-weight: bold; color: #ff4757; letter-spacing: 5px;
+            text-shadow: 0 0 20px #ff4757; animation: flashWarning 0.5s infinite alternate; pointer-events: none;
+        }
+        @keyframes flashWarning { from { opacity: 0.2; transform: scale(1); } to { opacity: 1; transform: scale(1.1); } }
+    </style>
+</head>
+<body>
+
+<div id="xp-bar-container"><div id="xp-bar"></div></div>
+<div id="hud" class="hidden">
+    <div class="hud-text" style="color:#f1c40f;">⭐ Lv. <span id="val-lv">1</span></div>
+    <div class="hud-text" style="color:#ff4757;">❤️ HP: <span id="val-hp">100</span></div>
+</div>
+
+<div id="boss-warning" class="hidden">⚠️ 焦虑黑洞 降临 ⚠️<br><span style="font-size:16px; color:#fff; text-shadow: 0 0 5px #000;">保持距离，用子弹击退它！</span></div>
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- 首页 -->
+<div id="ui-home" class="ui-layer">
+    <div class="menu-card">
+        <h1>心渊猎手</h1>
+        <p>你的大脑正在被负面念头入侵。<br>无需恐惧，你的潜意识会自动发射“逻辑光束”。<br>拖动屏幕移动，清空它们。</p>
+        <button class="btn" onclick="startGame()">潜入心渊</button>
+        <button class="btn" onclick="showRules()" style="margin-top: 10px; background: rgba(255,255,255,0.1);">游戏规则</button>
+    </div>
+</div>
+
+<!-- 游戏规则弹窗 -->
+<div id="ui-rules" class="ui-layer hidden">
+    <div class="menu-card" style="max-height: 80vh; overflow-y: auto;">
+        <h1>游戏规则</h1>
+        <p style="text-align: left; line-height: 1.8;">
+            <strong>基本操作：</strong><br>
+            • 拖动屏幕控制角色走位<br>
+            • 角色会自动瞄准并射击敌人<br>
+            • 收集发光的经验宝石升级<br>
+            <br>
+            <strong>游戏目标：</strong><br>
+            • 击败不断涌现的负面念头<br>
+            • 升级并选择强力的认知卡牌<br>
+            • 迎战并击杀最终BOSS：焦虑黑洞<br>
+            <br>
+            <strong>技能系统：</strong><br>
+            • 💪 认知重构：大幅提升子弹伤害<br>
+            • ⚡ 思维敏捷：提升射击频率<br>
+            • 🔫 证据重炮：子弹击中后分裂<br>
+            • 🪞 视角折射：子弹在敌人间弹射<br>
+            • 🛡️ 接纳力场：减速靠近的敌人<br>
+            • 💖 自我慈悲：立即恢复生命值<br>
+            <br>
+            <strong>Boss战指南：</strong><br>
+            • 达到 <strong>10级</strong> 后 Boss 降临<br>
+            • 你的视野会受到极大的压迫<br>
+            • 灵活走位，不要被 Boss 撞到<br>
+            • 依靠走位拉扯，用子弹将其消灭
+        </p>
+        <button class="btn" onclick="hideRules()" style="margin-top: 20px;">返回</button>
+    </div>
+</div>
+
+<!-- 升级三选一 -->
+<div id="ui-levelup" class="ui-layer hidden">
+    <h2 style="color: #f1c40f; letter-spacing: 2px; margin-bottom: 30px; text-shadow: 0 0 10px rgba(241,196,15,0.5);">认知升级</h2>
+    <div class="cards-container" id="cards-box">
+        <!-- 动态生成 -->
+    </div>
+</div>
+
+<!-- 结算页 -->
+<div id="ui-gameover" class="ui-layer hidden">
+    <div class="menu-card">
+        <h1 id="end-title" style="color:#ff4757;">心智枯竭</h1>
+        <p id="end-desc">你被负面情绪淹没了。<br>但没关系，休息一下再来重塑认知吧。</p>
+        <div style="font-size: 20px; color: #f1c40f; margin: 20px 0;">粉碎念头: <span id="val-kills">0</span></div>
+        <button class="btn" onclick="resetToHome()">返回首页</button>
+    </div>
+</div>
+
+<script>
+    // --- 核心设定与技能池 ---
+    const NEGATIVE_THOUGHTS = ["我不行", "好累", "太难了", "放弃吧", "我好糟", "来不及了"];
+    
+    const UPGRADE_POOL = [
+        { id: 'dmg', icon: '💪', name: '认知重构', desc: '伤害提升 50%，一击击碎虚妄。', weight: 10, action: () => player.dmg *= 1.5 },
+        { id: 'speed', icon: '⚡', name: '思维敏捷', desc: '射速提升 30%，不给焦虑留余地。', weight: 10, action: () => player.fireRate = Math.max(10, player.fireRate * 0.7) },
+        { id: 'split', icon: '🔫', name: '证据重炮', desc: '子弹击中怪物后会分裂，寻找更多支持性证据。', weight: 5, action: () => player.splitCount++ },
+        { id: 'bounce', icon: '🪞', name: '视角折射', desc: '子弹可以在敌人间弹射，隐喻多角度换位思考。', weight: 5, action: () => player.bounceCount++ },
+        { id: 'aura', icon: '🛡️', name: '接纳力场', desc: '周身形成减速圈，允许情绪存在但不被干扰。', weight: 5, action: () => player.auraRadius += 60 },
+        { id: 'heal', icon: '💖', name: '自我慈悲', desc: '立即恢复 50% 生命值。', weight: 8, action: () => player.hp = Math.min(player.maxHp, player.hp + player.maxHp*0.5) }
+    ];
+
+    // --- Web Audio API (爽感音效引擎) ---
+    let audioCtx;
+    function initAudio() { if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    
+    function playShoot() {
+        if(!audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playHit() {
+        if(!audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playXp() {
+        if(!audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function playLevelUp() {
+        if(!audioCtx) return;
+        [440, 554.37, 659.25].forEach((f, i) => { // 大三和弦
+            let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+            osc.type = 'triangle'; osc.frequency.value = f;
+            gain.gain.setValueAtTime(0, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.1 + i*0.1); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1);
+        });
+        if(navigator.vibrate) navigator.vibrate([50, 50, 100]);
+    }
+
+    function playBossHit() {
+        if(!audioCtx) return;
+        let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(80, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        if(navigator.vibrate) navigator.vibrate(30);
+    }
+
+    // --- 游戏引擎与渲染 ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    let gameState = 'INIT'; // INIT, PLAYING, LEVELUP, BOSS, OVER
+    let frame = 0;
+    let animationId = null; // 控制游戏循环
+    
+    // 实体数组
+    let enemies = [];
+    let bullets = [];
+    let gems = [];
+    let particles = [];
+    let floatingTexts = [];
+
+    // 玩家数据
+    let player = {
+        x: 0, y: 0, targetX: 0, targetY: 0, radius: 15,
+        hp: 100, maxHp: 100, speed: 8,
+        level: 1, xp: 0, xpNeeded: 10, kills: 0,
+        dmg: 25, fireRate: 40, lastFire: 0, bulletSpeed: 10,
+        splitCount: 0, bounceCount: 0, auraRadius: 0
+    };
+
+    // Boss 数据
+    let boss = null;
+    let visionRadius = 1000; // 视野范围
+
+    function resize() {
+        width = window.innerWidth; height = window.innerHeight;
+        canvas.width = width; canvas.height = height;
+        if(gameState === 'INIT') { 
+            player.x = width/2; player.y = height/2; 
+            player.targetX = width/2; player.targetY = height/2; 
+            ctx.fillStyle = '#050508'; 
+            ctx.fillRect(0, 0, width, height);
+        }
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // 触控输入 (虚拟摇杆式的拖拽移动)
+    function handleInput(e) {
+        if(gameState === 'LEVELUP' || gameState === 'OVER' || gameState === 'INIT') return;
+        e.preventDefault();
+        let ex = e.touches ? e.touches[0].clientX : e.clientX;
+        let ey = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        // 无论是否在BOSS战，只负责更新玩家目标点
+        player.targetX = ex;
+        player.targetY = ey;
+    }
+    
+    // 使用 passive: false 确保事件能够立即响应
+    canvas.addEventListener('touchmove', handleInput, {passive: false});
+    canvas.addEventListener('mousemove', handleInput);
+    canvas.addEventListener('touchstart', handleInput, {passive: false});
+    canvas.addEventListener('mousedown', handleInput);
+
+    // --- 游戏主逻辑 ---
+    function startGame() {
+        initAudio();
+        document.getElementById('ui-home').classList.add('hidden');
+        document.getElementById('hud').classList.remove('hidden');
+        gameState = 'PLAYING';
+        updateHUD();
+        
+        // 防止多次点击造成循环重叠
+        if (!animationId) {
+            gameLoop();
+        }
+    }
+
+    // 重置回到首页 (完美闭环)
+    function resetToHome() {
+        // 隐藏结算界面，显示首页
+        document.getElementById('ui-gameover').classList.add('hidden');
+        document.getElementById('ui-home').classList.remove('hidden');
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('boss-warning').classList.add('hidden');
+
+        // 重置游戏状态
+        gameState = 'INIT';
+        frame = 0;
+        enemies = [];
+        bullets = [];
+        gems = [];
+        particles = [];
+        floatingTexts = [];
+        boss = null;
+        visionRadius = 1000;
+
+        // 重置玩家数据
+        player = {
+            x: width/2, y: height/2, targetX: width/2, targetY: height/2, radius: 15,
+            hp: 100, maxHp: 100, speed: 8,
+            level: 1, xp: 0, xpNeeded: 10, kills: 0,
+            dmg: 25, fireRate: 40, lastFire: 0, bulletSpeed: 10,
+            splitCount: 0, bounceCount: 0, auraRadius: 0
+        };
+
+        updateHUD();
+
+        // 停止游戏循环并清空画布
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        ctx.fillStyle = '#050508';
+        ctx.fillRect(0, 0, width, height);
+        
+        // 去除残留的闪屏蒙版
+        let flash = document.getElementById('flash');
+        if(flash) {
+            flash.style.opacity = 0;
+            flash.style.background = 'white';
+        }
+        canvas.style.transform = 'none';
+    }
+    
+    function showRules() {
+        document.getElementById('ui-home').classList.add('hidden');
+        document.getElementById('ui-rules').classList.remove('hidden');
+    }
+    
+    function hideRules() {
+        document.getElementById('ui-rules').classList.add('hidden');
+        document.getElementById('ui-home').classList.remove('hidden');
+    }
+
+    function spawnEnemy() {
+        // 随等级增加生成频率
+        if (frame % Math.max(10, 60 - player.level * 2) !== 0) return;
+        
+        // 屏幕边缘生成
+        let ex, ey;
+        if (Math.random() < 0.5) {
+            ex = Math.random() < 0.5 ? -30 : width + 30;
+            ey = Math.random() * height;
+        } else {
+            ex = Math.random() * width;
+            ey = Math.random() < 0.5 ? -30 : height + 30;
+        }
+
+        let isElite = Math.random() < 0.05 * player.level;
+        let baseSpeed = 0.8 + (player.level - 1) * 0.1;
+        let maxSpeed = 1.8;
+        let enemySpeed = Math.min(baseSpeed + Math.random() * 0.5, maxSpeed);
+        
+        enemies.push({
+            x: ex, y: ey, radius: isElite ? 25 : 15,
+            hp: isElite ? 100 + player.level*20 : 30 + player.level*5,
+            speed: isElite ? Math.min(0.8 + (player.level - 1) * 0.08, 1.5) : enemySpeed,
+            color: isElite ? '#833471' : '#576574',
+            text: NEGATIVE_THOUGHTS[Math.floor(Math.random() * NEGATIVE_THOUGHTS.length)]
+        });
+    }
+
+    function autoShoot() {
+        if (frame - player.lastFire < player.fireRate) return;
+        
+        let target = null;
+        // BOSS战时，只瞄准BOSS
+        if(gameState === 'BOSS' && boss) {
+            target = boss;
+        } else if (enemies.length > 0) {
+            let nearest = null; let minDist = Infinity;
+            enemies.forEach(e => {
+                let dist = Math.hypot(e.x - player.x, e.y - player.y);
+                if (dist < minDist) { minDist = dist; nearest = e; }
+            });
+            target = nearest;
+        }
+
+        if (target) {
+            let angle = Math.atan2(target.y - player.y, target.x - player.x);
+            fireBullet(player.x, player.y, angle, player.dmg, player.bounceCount);
+            player.lastFire = frame;
+            playShoot();
+        }
+    }
+
+    function fireBullet(x, y, angle, dmg, bouncesLeft) {
+        bullets.push({
+            x: x, y: y, vx: Math.cos(angle) * player.bulletSpeed, vy: Math.sin(angle) * player.bulletSpeed,
+            radius: 5, dmg: dmg, bouncesLeft: bouncesLeft, life: 100
+        });
+    }
+
+    function triggerLevelUp() {
+        gameState = 'LEVELUP';
+        playLevelUp();
+        
+        let pool = [...UPGRADE_POOL].sort(() => Math.random() - 0.5).slice(0, 3);
+        let box = document.getElementById('cards-box');
+        box.innerHTML = '';
+        
+        pool.forEach(upg => {
+            let card = document.createElement('div');
+            card.className = 'upgrade-card';
+            card.innerHTML = `
+                <div class="upgrade-icon">${upg.icon}</div>
+                <div class="upgrade-info">
+                    <div class="upgrade-name">${upg.name}</div>
+                    <div class="upgrade-desc">${upg.desc}</div>
+                </div>
+            `;
+            card.onclick = () => {
+                upg.action();
+                document.getElementById('ui-levelup').classList.add('hidden');
+                
+                // 设置为 10 级触发 Boss 战
+                if(player.level >= 10 && !boss) {
+                    spawnBoss();
+                } else {
+                    gameState = 'PLAYING';
+                }
+            };
+            box.appendChild(card);
+        });
+        
+        document.getElementById('ui-levelup').classList.remove('hidden');
+    }
+
+    function spawnBoss() {
+        gameState = 'BOSS';
+        enemies = []; bullets = []; gems = []; // 清空小怪
+        document.getElementById('boss-warning').classList.remove('hidden');
+        
+        // 初始化强大的Boss，放在屏幕中心偏上
+        boss = {
+            x: width/2, y: height/4, radius: 80,
+            hp: 15000, maxHp: 15000, pulse: 0,
+            // 移动相关属性
+            vx: 2, vy: 2, // 初始速度
+            moveSpeed: 2, directionX: 1, directionY: 1,
+            targetX: width/2, targetY: height/4,
+            moveInterval: 0, moveIntervalMax: 60 // 每60帧改变一次移动方向
+        };
+
+        // 视野剥夺效果 (从 1000 迅速缩小到 150)
+        let visionInterval = setInterval(() => {
+            visionRadius -= 20;
+            if(visionRadius <= 150) clearInterval(visionInterval);
+        }, 50);
+    }
+
+    function triggerVictory() {
+        gameState = 'OVER';
+        document.getElementById('boss-warning').classList.add('hidden');
+        document.getElementById('hud').classList.add('hidden');
+        
+        document.getElementById('end-title').innerText = "心智澄澈";
+        document.getElementById('end-title').style.color = "#00d2d3";
+        document.getElementById('end-desc').innerText = "你用理智的光束击碎了焦虑黑洞，夺回了内心的平静。";
+        document.getElementById('val-kills').innerText = player.kills;
+        
+        document.getElementById('ui-gameover').classList.remove('hidden');
+        createExplosion(boss.x, boss.y, '#f1c40f', 150); // 巨型烟花
+    }
+
+    function triggerGameOver() {
+        gameState = 'OVER';
+        document.getElementById('hud').classList.add('hidden');
+        
+        document.getElementById('end-title').innerText = "心智枯竭";
+        document.getElementById('end-title').style.color = "#ff4757";
+        document.getElementById('end-desc').innerText = "你被负面情绪淹没了。\n但没关系，休息一下再来重塑认知吧。";
+        document.getElementById('val-kills').innerText = player.kills;
+        
+        document.getElementById('ui-gameover').classList.remove('hidden');
+    }
+
+    // --- 核心物理与更新逻辑 ---
+    function update() {
+        if (gameState === 'INIT' || gameState === 'OVER' || gameState === 'LEVELUP') return;
+
+        // 玩家移动平滑跟随
+        let dx = player.targetX - player.x;
+        let dy = player.targetY - player.y;
+        let dist = Math.hypot(dx, dy);
+        if(dist > 1) {
+            player.x += dx * 0.2;
+            player.y += dy * 0.2;
+        }
+
+        // 自动射击
+        if(gameState === 'PLAYING' || gameState === 'BOSS') {
+            autoShoot();
+        }
+
+        if(gameState === 'PLAYING') {
+            spawnEnemy();
+
+            // 更新敌人
+            for(let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                let inAura = player.auraRadius > 0 && Math.hypot(e.x - player.x, e.y - player.y) < player.auraRadius;
+                let currentSpeed = inAura ? e.speed * 0.3 : e.speed;
+
+                let edx = player.x - e.x; let edy = player.y - e.y;
+                let edist = Math.hypot(edx, edy);
+                e.x += (edx/edist) * currentSpeed;
+                e.y += (edy/edist) * currentSpeed;
+
+                // 碰撞玩家
+                if (edist < player.radius + e.radius) {
+                    player.hp -= 0.5;
+                    updateHUD();
+                    if(player.hp <= 0) triggerGameOver();
+                }
+            }
+
+            // 更新经验宝石
+            for(let i = gems.length - 1; i >= 0; i--) {
+                let g = gems[i];
+                let dist = Math.hypot(g.x - player.x, g.y - player.y);
+                if (dist < 100) { 
+                    g.x += (player.x - g.x) * 0.1;
+                    g.y += (player.y - g.y) * 0.1;
+                }
+                if (dist < player.radius + 5) {
+                    player.xp += g.val;
+                    playXp();
+                    gems.splice(i, 1);
+                    
+                    if(player.xp >= player.xpNeeded) {
+                        player.level++;
+                        player.xp -= player.xpNeeded;
+                        player.xpNeeded = Math.floor(player.xpNeeded * 1.5);
+                        triggerLevelUp();
+                    }
+                    updateHUD();
+                }
+            }
+        } 
+        else if (gameState === 'BOSS' && boss) {
+            // Boss 移动更新 (全屏高速反弹)
+            boss.x += boss.vx;
+            boss.y += boss.vy;
+
+            // 撞墙反弹
+            if (boss.x < boss.radius) { boss.x = boss.radius; boss.vx *= -1; }
+            if (boss.x > width - boss.radius) { boss.x = width - boss.radius; boss.vx *= -1; }
+            if (boss.y < boss.radius) { boss.y = boss.radius; boss.vy *= -1; }
+            if (boss.y > height - boss.radius) { boss.y = height - boss.radius; boss.vy *= -1; }
+
+            boss.pulse += 0.1;
+
+            // Boss的引力拉扯玩家
+            let dxToBoss = boss.x - player.x; 
+            let dyToBoss = boss.y - player.y;
+            player.x += dxToBoss * 0.002; 
+            player.y += dyToBoss * 0.002;
+            
+            // 如果玩家被Boss撞到，造成大量碰撞伤害
+            let distToBoss = Math.hypot(dxToBoss, dyToBoss);
+            if(distToBoss < player.radius + boss.radius) {
+                let pushDistance = player.radius + boss.radius - distToBoss;
+                player.x -= (dxToBoss / distToBoss) * pushDistance;
+                player.y -= (dyToBoss / distToBoss) * pushDistance;
+
+                if(frame % 15 === 0) { // 降低扣血频率以免秒杀
+                    player.hp -= 10;
+                    updateHUD();
+                    
+                    let flash = document.createElement('div');
+                    flash.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(231,76,60,0.5);z-index:100;pointer-events:none;";
+                    document.body.appendChild(flash);
+                    setTimeout(() => flash.remove(), 100);
+                    
+                    if(player.hp <= 0) triggerGameOver();
+                }
+            }
+        }
+
+        // === 更新子弹与伤害检测 ===
+        for(let i = bullets.length - 1; i >= 0; i--) {
+            let b = bullets[i];
+            b.x += b.vx; b.y += b.vy; b.life--;
+            
+            if(b.life <= 0 || b.x<0 || b.x>width || b.y<0 || b.y>height) { 
+                bullets.splice(i,1); 
+                continue; 
+            }
+
+            let bulletHit = false;
+
+            // 检测击中 BOSS
+            if(gameState === 'BOSS' && boss) {
+                if(Math.hypot(b.x - boss.x, b.y - boss.y) < b.radius + boss.radius) {
+                    boss.hp -= b.dmg;
+                    playBossHit();
+                    createExplosion(b.x, b.y, '#ff4757');
+                    spawnText(b.x, b.y, b.dmg, '#ff4757');
+                    
+                    bullets.splice(i, 1);
+                    bulletHit = true;
+                    
+                    if(boss.hp <= 0) triggerVictory();
+                    continue; 
+                }
+            }
+
+            // 检测击中小怪
+            if(!bulletHit && gameState === 'PLAYING') {
+                for(let j = enemies.length - 1; j >= 0; j--) {
+                    let e = enemies[j];
+                    if(Math.hypot(b.x - e.x, b.y - e.y) < b.radius + e.radius) {
+                        e.hp -= b.dmg;
+                        playHit();
+                        createExplosion(b.x, b.y, '#00d2d3');
+                        spawnText(e.x, e.y, b.dmg, '#fff');
+
+                        if(player.splitCount > 0 && !b.isSplit) {
+                            let angle1 = Math.atan2(b.vy, b.vx) + 0.5;
+                            let angle2 = Math.atan2(b.vy, b.vx) - 0.5;
+                            let splitB1 = {x: b.x, y: b.y, vx: Math.cos(angle1)*player.bulletSpeed, vy: Math.sin(angle1)*player.bulletSpeed, radius: 3, dmg: b.dmg*0.5, life: 50, isSplit: true};
+                            let splitB2 = {x: b.x, y: b.y, vx: Math.cos(angle2)*player.bulletSpeed, vy: Math.sin(angle2)*player.bulletSpeed, radius: 3, dmg: b.dmg*0.5, life: 50, isSplit: true};
+                            bullets.push(splitB1, splitB2);
+                        }
+                        if(b.bouncesLeft > 0 && enemies.length > 1) {
+                            b.bouncesLeft--;
+                            let nextEnemy = enemies[j===0?1:0]; 
+                            let nAngle = Math.atan2(nextEnemy.y - b.y, nextEnemy.x - b.x);
+                            b.vx = Math.cos(nAngle) * player.bulletSpeed;
+                            b.vy = Math.sin(nAngle) * player.bulletSpeed;
+                        } else {
+                            bullets.splice(i, 1);
+                        }
+
+                        if(e.hp <= 0) {
+                            gems.push({x: e.x, y: e.y, val: e.radius === 25 ? 5 : 1});
+                            enemies.splice(j, 1);
+                            player.kills++;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 粒子更新
+        particles.forEach((p, i) => { p.x += p.vx; p.y += p.vy; p.life -= 0.05; if(p.life<=0) particles.splice(i,1); });
+        floatingTexts.forEach((t, i) => { t.y -= 1; t.life -= 0.02; if(t.life<=0) floatingTexts.splice(i,1); });
+
+        frame++;
+    }
+
+    // --- 渲染逻辑 ---
+    function draw() {
+        if (gameState === 'INIT') return;
+
+        // 清屏
+        ctx.fillStyle = '#050508'; ctx.fillRect(0, 0, width, height);
+
+        // 接纳力场光环
+        if (player.auraRadius > 0 && gameState !== 'OVER') {
+            ctx.beginPath(); ctx.arc(player.x, player.y, player.auraRadius, 0, Math.PI*2);
+            ctx.fillStyle = 'rgba(0, 210, 211, 0.1)'; ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 210, 211, 0.3)'; ctx.lineWidth = 2; ctx.setLineDash([10, 5]); ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        // 经验宝石
+        ctx.fillStyle = '#f1c40f'; ctx.shadowColor = '#f1c40f'; ctx.shadowBlur = 10;
+        gems.forEach(g => {
+            ctx.beginPath(); ctx.arc(g.x, g.y, g.val === 5 ? 6 : 4, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.shadowBlur = 0;
+
+        // 敌人 (负面念头)
+        enemies.forEach(e => {
+            ctx.fillStyle = e.color;
+            ctx.beginPath();
+            let wobble = Math.sin(frame*0.1 + e.x) * 3;
+            ctx.ellipse(e.x, e.y, e.radius + wobble, e.radius - wobble, 0, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.font = `bold ${e.radius*0.6}px PingFang SC`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(e.text, e.x, e.y);
+        });
+
+        // 子弹 (逻辑光束)
+        ctx.fillStyle = '#00d2d3';
+        bullets.forEach(b => {
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 210, 211, 0.5)'; ctx.lineWidth = b.radius*2;
+            ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx*2, b.y - b.vy*2); ctx.stroke();
+        });
+
+        // Boss (焦虑黑洞)
+        if (gameState === 'BOSS' && boss && gameState !== 'OVER') {
+            let glow = 20 + Math.sin(boss.pulse) * 10;
+            ctx.shadowColor = '#ff4757'; ctx.shadowBlur = glow;
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(boss.x, boss.y, boss.radius, 0, Math.PI*2); ctx.fill();
+            
+            ctx.strokeStyle = '#ff4757'; ctx.lineWidth = 2;
+            for(let i=0; i<3; i++) {
+                ctx.beginPath(); ctx.arc(boss.x, boss.y, boss.radius + glow*i - (frame%20), 0, Math.PI*2); ctx.stroke();
+            }
+            ctx.shadowBlur = 0;
+
+            // Boss 血条跟随
+            ctx.fillStyle = 'rgba(255,0,0,0.3)'; ctx.fillRect(boss.x - 50, boss.y - 100, 100, 8);
+            ctx.fillStyle = '#ff4757'; ctx.fillRect(boss.x - 50, boss.y - 100, 100 * (Math.max(0, boss.hp)/boss.maxHp), 8);
+        }
+        
+        // 玩家 (发光核心)
+        if (gameState !== 'OVER') {
+            ctx.fillStyle = '#00d2d3'; ctx.shadowColor = '#00d2d3'; ctx.shadowBlur = 20;
+            ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(player.x, player.y, player.radius*0.5, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        // --- Boss 战的视野剥夺遮罩，覆盖在所有实体之上，仅透出玩家视野 ---
+        if (gameState === 'BOSS') {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, visionRadius, 0, Math.PI*2);
+            ctx.rect(width, 0, -width, height);
+            ctx.fillStyle = 'rgba(0,0,0,0.96)'; // 极度黑暗的蒙版
+            ctx.fill('evenodd');
+            ctx.restore();
+        }
+
+        // 粒子与伤害文字 (放在遮罩上面显示)
+        particles.forEach(p => {
+            ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha = 1;
+        });
+        floatingTexts.forEach(t => {
+            ctx.globalAlpha = Math.max(0, t.life); ctx.fillStyle = t.color;
+            ctx.font = 'bold 16px Arial'; ctx.textAlign='center'; ctx.fillText(t.text, t.x, t.y); ctx.globalAlpha = 1;
+        });
+    }
+
+    // --- 辅助特效与循环 ---
+    function createExplosion(x, y, color, count=15) {
+        for(let i=0; i<count; i++) {
+            let angle = Math.random() * Math.PI * 2; let speed = Math.random() * 4 + 1;
+            particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1, color, size: Math.random()*3+1 });
+        }
+    }
+    function spawnText(x, y, text, color) { floatingTexts.push({ x, y, text: Math.floor(text), color, life: 1 }); }
+
+    function updateHUD() {
+        document.getElementById('val-lv').innerText = player.level;
+        document.getElementById('val-hp').innerText = Math.floor(player.hp);
+        document.getElementById('xp-bar').style.width = `${(player.xp / player.xpNeeded) * 100}%`;
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        animationId = requestAnimationFrame(gameLoop);
+    }
+</script>
+</body>
+</html>
