@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>愈了个愈 - 学生解压小游戏</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #gameCanvas {
+            display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;
+        }
+
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(12px);
+            transition: opacity 0.4s ease;
+        }
+
+        .hidden { opacity: 0; pointer-events: none; }
+
+        #btn-back {
+            position: absolute; top: 3%; left: 3%; z-index: 20;
+            background: rgba(255,255,255,0.8); border: none; padding: 8px 15px;
+            border-radius: 20px; font-weight: bold; color: #576574;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
+            font-size: 14px;
+        }
+
+        #top-bar {
+            position: absolute; top: 3%; width: 100%; text-align: center;
+            z-index: 5; font-size: 16px; font-weight: bold; color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95); border-radius: 24px;
+            padding: 30px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            text-align: center; width: 85%; max-width: 340px;
+        }
+
+        .glass-card h1 { color: #6c5ce7; margin: 0 0 10px 0; font-size: 26px; }
+        .glass-card p { color: #636e72; font-size: 14px; margin-bottom: 20px; }
+
+        .btn {
+            display: block; width: 100%; background: #f1f2f6; border: none;
+            padding: 14px; margin-bottom: 10px; border-radius: 16px;
+            font-size: 15px; font-weight: bold; cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .opt-study { background: #e3f2fd; color: #1976d2; }
+        .opt-exam { background: #fff3e0; color: #e65100; }
+        .opt-life { background: #e8f5e9; color: #2e7d32; }
+        .btn-primary { background: #6c5ce7; color: white; margin-top: 10px; }
+        .btn-secondary { background: #74b9ff; color: white; }
+        .btn-success { background: #00b894; color: white; }
+        .btn-danger { background: #ff7675; color: white; }
+
+        #breathe-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.7); z-index: 30;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .breathe-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: radial-gradient(circle, #00d2d3, #0984e3);
+            animation: breatheAnim 3s ease-in-out forwards;
+        }
+        .breathe-text { color: white; font-size: 18px; margin-top: 25px; font-weight: bold; }
+        
+        @keyframes breatheAnim {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(2.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* 道具按钮样式 - 移到卡槽下方 */
+        #tools-bar {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 25px; z-index: 15;
+            background: rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+        .tool-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%; border: none;
+            font-size: 20px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.15s, box-shadow 0.15s;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .tool-btn:active { transform: scale(0.9); }
+        .tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .tool-btn span { 
+            font-size: 11px; 
+            position: absolute; 
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        
+        /* 复活提示 */
+        #revive-hint {
+            position: absolute; top: 8%; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 193, 7, 0.9); color: #333;
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 14px; font-weight: bold;
+            z-index: 25; display: none;
+        }
+
+        /* 答题界面样式 */
+        .quiz-option {
+            display: block; width: 100%; background: #f8f9fa; border: 2px solid #e9ecef;
+            padding: 12px; margin-bottom: 10px; border-radius: 12px;
+            font-size: 14px; cursor: pointer; text-align: left;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover { background: #e3f2fd; border-color: #74b9ff; }
+        .quiz-option.correct { background: #d4edda; border-color: #00b894; }
+        .quiz-option.wrong { background: #f8d7da; border-color: #ff7675; }
+        
+        .quiz-progress {
+            width: 100%; height: 6px; background: #e9ecef; border-radius: 3px;
+            margin: 15px 0; overflow: hidden;
+        }
+        .quiz-progress-bar {
+            height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px; transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="btn-back" class="hidden" onclick="returnToMenu()">← 返回</button>
+    <div id="top-bar" class="hidden">收集3个相同物品消除，清空所有卡牌获胜！</div>
+    <div id="revive-hint">已使用复活机会！卡牌已移回场上</div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- 选择挑战主题 -->
+    <div id="start-screen" class="ui-layer">
+        <div class="glass-card">
+            <h1>🌸 愈了个愈</h1>
+            <p>学习压力大？来放松一下！<br>选择你当前的烦恼来源：</p>
+            <button class="btn opt-study" onclick="startSmash('study')">📖 学业压力 (作业、课程...)</button>
+            <button class="btn opt-exam" onclick="startSmash('exam')">📝 考试焦虑 (成绩、排名...)</button>
+            <button class="btn opt-life" onclick="startSmash('life')">🎮 校园生活 (社交、时间...)</button>
+        </div>
+    </div>
+
+    <!-- 槽位满了：游戏结束 -->
+    <div id="game-over-screen" class="ui-layer hidden">
+        <div class="glass-card">
+            <h1 style="color:#d63031;">槽位已满！</h1>
+            <p id="game-over-text">卡槽已经塞不下更多卡牌了...</p>
+            <button id="revive-btn" class="btn btn-primary" onclick="startReviveQuiz()">🧠 答题复活 (积极心理学)</button>
+            <button class="btn" onclick="returnToMenu()" style="background:#dfe6e9; color:#2d3436;">重新开始</button>
+        </div>
+    </div>
+
+    <!-- 复活答题界面 -->
+    <div id="quiz-screen" class="ui-layer hidden">
+        <div class="glass-card" style="max-width: 360px;">
+            <h1 style="font-size: 20px;">🧠 复活挑战</h1>
+            <p style="font-size: 12px; color: #6c5ce7;">答对这道题才能复活哦！</p>
+            
+            <div class="quiz-progress">
+                <div class="quiz-progress-bar" id="quiz-timer-bar" style="width: 100%;"></div>
+            </div>
+            
+            <p id="quiz-question" style="font-size: 15px; font-weight: bold; color: #2d3436; margin: 15px 0; text-align: left;"></p>
+            
+            <div id="quiz-options"></div>
+            
+            <p id="quiz-feedback" style="margin-top: 15px; font-size: 14px; font-weight: bold; min-height: 20px;"></p>
+        </div>
+    </div>
+
+    <!-- 胜利界面 -->
+    <div id="win-screen" class="ui-layer hidden">
+        <div class="glass-card">
+            <h1 style="color:#00b894;">🎉 恭喜通关！</h1>
+            <p id="win-text">你真棒！所有烦恼都清空啦！</p>
+            <button class="btn btn-primary" onclick="returnToMenu()">再玩一局</button>
+        </div>
+    </div>
+
+    <div id="breathe-overlay" class="hidden">
+        <div class="breathe-circle"></div>
+        <div class="breathe-text">深呼吸...</div>
+    </div>
+
+    <!-- 道具栏 -->
+    <div id="tools-bar" class="hidden">
+        <button class="tool-btn" id="btn-remove" onclick="useRemove()" title="移除：将卡槽前3张移回场上">
+            🗑️
+            <span>移除</span>
+        </button>
+        <button class="tool-btn" id="btn-undo" onclick="useUndo()" title="撤回：撤销上一步操作">
+            ↩️
+            <span>撤回</span>
+        </button>
+        <button class="tool-btn" id="btn-shuffle" onclick="useShuffle()" title="洗牌：打乱牌的顺序">
+            🔀
+            <span>洗牌</span>
+        </button>
+    </div>
+
+<script>
+    // --- 学生主题配置 ---
+    const themes = {
+        study: {
+            stressWords: ["作业堆积", "课程太难", "听不懂", "拖延症", "知识点太多", "学习效率低"],
+            quotes: ["慢慢来，你比昨天更棒了！", "坚持就是胜利！", "相信自己，你可以的！", "每一步都算数！"]
+        },
+        exam: {
+            stressWords: ["考试焦虑", "怕考砸", "排名压力", "复习不完", "粗心大意", "紧张手抖"],
+            quotes: ["考试只是检验，不是定义！", "放轻松，你准备得很好！", "一次考试不代表全部！", "深呼吸，你可以的！"]
+        },
+        life: {
+            stressWords: ["作息混乱", "社交恐惧", "手机依赖", "时间管理差", "宿舍矛盾", "想家"],
+            quotes: ["照顾好自己最重要！", "适当的休息也是进步！", "你值得被温柔对待！", "明天会更好！"]
+        }
+    };
+
+    // --- 积极心理学选择题库 ---
+    const quizQuestions = [
+        {
+            question: "当我们感到焦虑时，以下哪种方法最有助于平复情绪？",
+            options: ["深呼吸，专注于当下", "不断回想让你焦虑的事情", "逃避问题，不去想它", "责怪自己为什么焦虑"],
+            correct: 0,
+            explanation: "深呼吸能激活副交感神经系统，帮助我们平静下来。"
+        },
+        {
+            question: "'成长型思维'的核心观点是？",
+            options: ["天赋决定一切，努力没用", "能力可以通过努力和学习不断提升", "失败意味着我不够好", "别人的成功让我显得失败"],
+            correct: 1,
+            explanation: "成长型思维相信能力是可以培养的，失败是学习的机会。"
+        },
+        {
+            question: "考试前紧张时，告诉自己'我已经准备充分了'属于什么技巧？",
+            options: ["自我否定", "积极自我对话", "逃避现实", "过度自信"],
+            correct: 1,
+            explanation: "积极的自我对话可以帮助我们建立信心，缓解焦虑。"
+        },
+        {
+            question: "以下哪种想法属于'灾难化思维'？",
+            options: ["这次没考好，下次再努力", "如果这次考砸了，我的人生就完了", "犯错是正常的，我可以从中学习", "每个人都有自己的节奏"],
+            correct: 1,
+            explanation: "灾难化思维是把小挫折想象成无法挽回的灾难，会增加焦虑。"
+        },
+        {
+            question: "'正念'练习主要是指？",
+            options: ["不断担忧未来", "沉浸在过去的后悔中", "专注于当下的感受和体验", "逃避现实中的问题"],
+            correct: 2,
+            explanation: "正念是专注于当下，不加评判地觉察自己的感受和想法。"
+        },
+        {
+            question: "当我们感到压力很大时，向朋友倾诉属于什么应对方式？",
+            options: ["逃避问题", "寻求社会支持", "软弱的表现", "浪费时间"],
+            correct: 1,
+            explanation: "寻求社会支持是健康的应对方式，能帮助我们缓解压力。"
+        },
+        {
+            question: "'完美主义'的负面影响不包括？",
+            options: ["害怕失败而不敢尝试", "对自己过于苛刻", "享受学习和成长的过程", "因为小错误而过度自责"],
+            correct: 2,
+            explanation: "健康的追求完美是享受过程，而病态完美主义会让人害怕失败。"
+        },
+        {
+            question: "以下哪种睡眠习惯最有利于心理健康？",
+            options: ["熬夜刷手机到很晚", "每天保持规律的作息时间", "周末补觉睡到中午", "睡前喝咖啡提神"],
+            correct: 1,
+            explanation: "规律的作息有助于调节生物钟，改善情绪和精神状态。"
+        },
+        {
+            question: "'自我关怀'的意思是？",
+            options: ["对自己非常严格", "像对待好朋友一样善待自己", "总是把自己放在最后", "不断批评自己的错误"],
+            correct: 1,
+            explanation: "自我关怀是用友善和理解的态度对待自己，而不是自我批评。"
+        },
+        {
+            question: "当我们感到 overwhelmed（不知所措）时，以下哪种做法最好？",
+            options: ["同时处理所有事情", "把大任务分解成小步骤", "放弃所有努力", "责怪自己不够强"],
+            correct: 1,
+            explanation: "把大任务分解成小步骤，可以让我们感到更有掌控感。"
+        },
+        {
+            question: "'情绪粒度'高意味着什么？",
+            options: ["能准确识别和描述自己的情绪", "情绪变化很快", "没有情绪波动", "容易情绪失控"],
+            correct: 0,
+            explanation: "情绪粒度是准确识别和表达情绪的能力，有助于情绪管理。"
+        },
+        {
+            question: "以下哪种想法更有助于建立自信？",
+            options: ["我永远比不上别人", "我的价值不取决于单一的成绩", "一次失败说明我无能", "别人的评价决定我是谁"],
+            correct: 1,
+            explanation: "健康的自信来自于认识到自己的价值是多维度的。"
+        },
+        {
+            question: "'心流'状态是指？",
+            options: ["心不在焉", "完全沉浸在某项活动中，忘记时间", "焦虑不安", "昏昏欲睡"],
+            correct: 1,
+            explanation: "心流是全身心投入活动的状态，能带来满足感和幸福感。"
+        },
+        {
+            question: "当我们遇到挫折时，'成长型思维'会怎么想？",
+            options: ["我天生就不行", "这次失败了，但我可以从中学习", "放弃吧，我不适合这个", "都是别人的错"],
+            correct: 1,
+            explanation: "成长型思维把挫折看作学习机会，而不是能力的证明。"
+        },
+        {
+            question: "以下哪种行为属于'自我照顾'？",
+            options: ["为了学习连续熬夜", "适当休息，给自己放松的时间", "忽略自己的感受", "强迫自己完成所有任务"],
+            correct: 1,
+            explanation: "自我照顾是关注自己的身心需求，适当的休息也是进步。"
+        }
+    ];
+
+    // 学生主题卡牌库 - 14种类型，适中难度
+    const TILE_TYPES = [
+        { id: 1, emoji: '📚', color: '#ff9ff3', name: '书本' },
+        { id: 2, emoji: '✏️', color: '#54a0ff', name: '铅笔' },
+        { id: 3, emoji: '🎒', color: '#5f27cd', name: '书包' },
+        { id: 4, emoji: '📐', color: '#00d2d3', name: '尺子' },
+        { id: 5, emoji: '🏆', color: '#ffdd59', name: '奖杯' },
+        { id: 6, emoji: '💡', color: '#ff9f43', name: '灵感' },
+        { id: 7, emoji: '🍎', color: '#ff6b6b', name: '苹果' },
+        { id: 8, emoji: '⭐', color: '#feca57', name: '星星' },
+        { id: 9, emoji: '📖', color: '#a29bfe', name: '课本' },
+        { id: 10, emoji: '🖊️', color: '#74b9ff', name: '钢笔' },
+        { id: 11, emoji: '📒', color: '#fd79a8', name: '笔记本' },
+        { id: 12, emoji: '🧮', color: '#00b894', name: '算盘' },
+        { id: 13, emoji: '🎨', color: '#e17055', name: '画板' },
+        { id: 14, emoji: '🌍', color: '#0984e3', name: '地球仪' }
+    ];
+
+    // --- 音频系统 ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+    }
+
+    function playSound(type) {
+        if (!audioCtx) initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        switch(type) {
+            case 'click':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+                break;
+            case 'match':
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(800, now + 0.05);
+                osc2.frequency.exponentialRampToValueAtTime(1600, now + 0.25);
+                gain2.gain.setValueAtTime(0.3, now + 0.05);
+                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc2.start(now + 0.05);
+                osc2.stop(now + 0.3);
+                break;
+            case 'error':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+                break;
+            case 'revive':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.4);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+                break;
+            case 'tool':
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(1000, now);
+                osc.frequency.exponentialRampToValueAtTime(2000, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+                break;
+            case 'win':
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.3, now + i * 0.15);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.15 + 0.4);
+                    o.start(now + i * 0.15);
+                    o.stop(now + i * 0.15 + 0.4);
+                });
+                break;
+            case 'shuffle':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+                break;
+            case 'correct':
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523, now);
+                osc.frequency.setValueAtTime(659, now + 0.1);
+                osc.frequency.setValueAtTime(784, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+                break;
+            case 'wrong':
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+                break;
+        }
+    }
+
+    // --- 引擎与基础设置 ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let TILE_SIZE = 38; // 手机端稍微小一点
+    let BAR_SLOTS = 7;
+    let barY = 0;
+    
+    // 检测是否手机端
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if(isMobile) {
+        TILE_SIZE = 36; // 手机上更小
+    }
+
+    let gameState = 'START';
+    let currentTheme = 'study';
+    
+    let tiles = [];
+    let collectionBar = [];
+    let pendingTiles = [];
+    let smashBlocks = [];
+    let floatingTexts = [];
+    let particles = [];
+    let history = [];
+    let hasRevived = false;
+    let toolsUsed = { remove: false, undo: false, shuffle: false };
+    let isShuffling = false;
+    let currentQuiz = null;
+    let quizTimer = null;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        barY = height - TILE_SIZE - 85;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- 状态1：击碎压力方块 ---
+    function startSmash(theme) {
+        initAudio();
+        currentTheme = theme;
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('btn-back').classList.remove('hidden');
+        
+        smashBlocks = [];
+        let words = themes[theme].stressWords;
+        let selectedWords = words.sort(() => 0.5 - Math.random()).slice(0, 3);
+        
+        selectedWords.forEach((word, index) => {
+            smashBlocks.push({
+                x: width/2 + (Math.random()-0.5)*80,
+                y: height/2 - 80 + index*70,
+                w: 160, h: 50, text: word,
+                vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2,
+                broken: false
+            });
+        });
+        
+        gameState = 'SMASH';
+    }
+
+    // --- 状态2：初始化牌堆 ---
+    function initSheepGame() {
+        tiles = [];
+        collectionBar = [];
+        pendingTiles = [];
+        history = [];
+        hasRevived = false;
+        toolsUsed = { remove: false, undo: false, shuffle: false };
+        isShuffling = false;
+        
+        // 适中难度：63张卡牌，4层
+        let totalGroups = 21;
+        let typePool = [];
+        
+        for(let i=0; i<totalGroups; i++) {
+            let type = TILE_TYPES[Math.floor(Math.random() * TILE_TYPES.length)];
+            typePool.push(type, type, type);
+        }
+        typePool.sort(() => 0.5 - Math.random());
+
+        let centerX = width / 2;
+        let centerY = height * 0.42;
+        let spreadX = TILE_SIZE * 1.0;
+        let spreadY = TILE_SIZE * 0.9;
+        
+        // 4层结构，适中难度
+        let layers = [
+            { count: 22, zRange: [0, 8], xRange: 3.0, yRange: 3.5 },
+            { count: 18, zRange: [9, 18], xRange: 2.5, yRange: 3.0 },
+            { count: 14, zRange: [19, 28], xRange: 2.0, yRange: 2.5 },
+            { count: 9, zRange: [29, 36], xRange: 1.5, yRange: 2.0 }
+        ];
+        
+        let poolIndex = 0;
+        let globalZ = 0;
+        
+        layers.forEach(layer => {
+            for(let i=0; i<layer.count && poolIndex < typePool.length; i++) {
+                let x = centerX + (Math.random() - 0.5) * spreadX * layer.xRange * 2;
+                let y = centerY + (Math.random() - 0.5) * spreadY * layer.yRange * 2;
+                
+                // 减少网格对齐，增加随机偏移，使卡牌分布更不规则
+                x = Math.round(x / (TILE_SIZE/3)) * (TILE_SIZE/3) + (Math.random() - 0.5) * 8;
+                y = Math.round(y / (TILE_SIZE/3)) * (TILE_SIZE/3) + (Math.random() - 0.5) * 8;
+
+                tiles.push({
+                    id: poolIndex, x: x, y: y, z: globalZ++,
+                    targetX: x, targetY: y,
+                    originalX: x, originalY: y,
+                    type: typePool[poolIndex],
+                    state: 'board'
+                });
+                poolIndex++;
+            }
+        });
+        
+        tiles.sort((a, b) => a.z - b.z);
+        
+        gameState = 'PLAYING';
+        document.getElementById('top-bar').classList.remove('hidden');
+        document.getElementById('tools-bar').classList.remove('hidden');
+        updateToolButtons();
+    }
+
+    // --- 复活答题机制 ---
+    function startReviveQuiz() {
+        if(hasRevived) return;
+        
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        
+        // 随机选择一道题
+        currentQuiz = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
+        
+        // 显示题目
+        document.getElementById('quiz-question').textContent = currentQuiz.question;
+        
+        // 显示选项
+        let optionsHtml = '';
+        currentQuiz.options.forEach((option, index) => {
+            optionsHtml += `<button class="quiz-option" onclick="answerQuiz(${index})">${String.fromCharCode(65 + index)}. ${option}</button>`;
+        });
+        document.getElementById('quiz-options').innerHTML = optionsHtml;
+        document.getElementById('quiz-feedback').textContent = '';
+        
+        // 启动倒计时
+        startQuizTimer();
+    }
+
+    function startQuizTimer() {
+        let timeLeft = 300; // 30秒，每100ms减1
+        let timerBar = document.getElementById('quiz-timer-bar');
+        timerBar.style.width = '100%';
+        timerBar.style.background = 'linear-gradient(90deg, #667eea, #764ba2)';
+        
+        quizTimer = setInterval(() => {
+            timeLeft -= 1;
+            timerBar.style.width = (timeLeft / 300 * 100) + '%';
+            
+            if(timeLeft <= 100) { // 最后10秒变红
+                timerBar.style.background = '#ff7675';
+            }
+            
+            if(timeLeft <= 0) {
+                clearInterval(quizTimer);
+                answerQuiz(-1); // 超时
+            }
+        }, 100);
+    }
+
+    function answerQuiz(answerIndex) {
+        clearInterval(quizTimer);
+        
+        let options = document.querySelectorAll('.quiz-option');
+        let feedback = document.getElementById('quiz-feedback');
+        
+        if(answerIndex === currentQuiz.correct) {
+            // 答对了
+            playSound('correct');
+            options[answerIndex].classList.add('correct');
+            feedback.textContent = '✅ ' + currentQuiz.explanation;
+            feedback.style.color = '#00b894';
+            
+            setTimeout(() => {
+                document.getElementById('quiz-screen').classList.add('hidden');
+                executeRevive();
+            }, 2500);
+        } else {
+            // 答错了
+            playSound('wrong');
+            if(answerIndex >= 0) {
+                options[answerIndex].classList.add('wrong');
+            }
+            options[currentQuiz.correct].classList.add('correct');
+            feedback.textContent = '❌ ' + currentQuiz.explanation;
+            feedback.style.color = '#ff7675';
+            
+            setTimeout(() => {
+                document.getElementById('quiz-screen').classList.add('hidden');
+                returnToMenu();
+            }, 3000);
+        }
+    }
+
+    function executeRevive() {
+        hasRevived = true;
+        playSound('revive');
+        
+        let count = Math.min(3, collectionBar.length);
+        for(let i=0; i<count; i++) {
+            let tile = collectionBar.shift();
+            tile.state = 'pending';
+            pendingTiles.push(tile);
+        }
+        
+        updateBarPositions();
+        updatePendingPositions();
+        
+        gameState = 'PLAYING';
+        
+        const hint = document.getElementById('revive-hint');
+        hint.style.display = 'block';
+        setTimeout(() => { hint.style.display = 'none'; }, 3000);
+        
+        spawnFloatingText(width/2, height/2 - 100, "答题成功！卡牌已移回场上");
+    }
+
+    // --- 核心交互与逻辑 ---
+    // 优化：缓存可点击状态，避免每帧重复计算
+    let clickableCache = new Map();
+    let lastClickableCheck = 0;
+    
+    function updateClickableCache() {
+        clickableCache.clear();
+        for(let t of tiles) {
+            if(t.state === 'board') {
+                clickableCache.set(t.id, isClickable(t));
+            }
+        }
+        lastClickableCheck = Date.now();
+    }
+    
+    function getClickable(tile) {
+        // 每100ms更新一次缓存
+        if(Date.now() - lastClickableCheck > 100) {
+            updateClickableCache();
+        }
+        return clickableCache.get(tile.id) ?? isClickable(tile);
+    }
+
+    function handleInput(e) {
+        if(isShuffling) return;
+        
+        // 阻止默认行为，防止滚动
+        if(e.touches) e.preventDefault();
+        
+        let ex, ey;
+        if(e.touches) { ex = e.touches[0].clientX; ey = e.touches[0].clientY; }
+        else { ex = e.clientX; ey = e.clientY; }
+
+        if (gameState === 'SMASH') {
+            let allBroken = true;
+            for(let b of smashBlocks) {
+                if(!b.broken && ex > b.x - b.w/2 && ex < b.x + b.w/2 && ey > b.y - b.h/2 && ey < b.y + b.h/2) {
+                    b.broken = true;
+                    playSound('click');
+                    createParticles(b.x, b.y, '#95a5a6', 8);
+                    needsRedraw = true;
+                }
+                if(!b.broken) allBroken = false;
+            }
+            if(allBroken) {
+                setTimeout(() => { initSheepGame(); }, 400);
+            }
+        } 
+        else if (gameState === 'PLAYING') {
+            if(collectionBar.length >= BAR_SLOTS) return;
+
+            for(let i = pendingTiles.length - 1; i >= 0; i--) {
+                let t = pendingTiles[i];
+                if (ex > t.x - TILE_SIZE/2 && ex < t.x + TILE_SIZE/2 &&
+                    ey > t.y - TILE_SIZE/2 && ey < t.y + TILE_SIZE/2) {
+                    movePendingToBar(t, i);
+                    needsRedraw = true;
+                    return;
+                }
+            }
+
+            for(let i = tiles.length - 1; i >= 0; i--) {
+                let t = tiles[i];
+                if (t.state === 'board' && getClickable(t)) {
+                    if (ex > t.x - TILE_SIZE/2 && ex < t.x + TILE_SIZE/2 &&
+                        ey > t.y - TILE_SIZE/2 && ey < t.y + TILE_SIZE/2) {
+                        moveToBar(t);
+                        needsRedraw = true;
+                        // 点击后更新缓存
+                        updateClickableCache();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    canvas.addEventListener('mousedown', handleInput);
+    canvas.addEventListener('touchstart', handleInput, {passive: false});
+
+    function isClickable(tile) {
+        // 适中难度：稍微增加重叠检测
+        let overlapThreshold = isMobile ? 0.82 : 0.85;
+        for(let i = 0; i < tiles.length; i++) {
+            let other = tiles[i];
+            if(other.state === 'board' && other.z > tile.z) {
+                if (Math.abs(tile.x - other.x) < TILE_SIZE * overlapThreshold && 
+                    Math.abs(tile.y - other.y) < TILE_SIZE * overlapThreshold) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function moveToBar(tile) {
+        // 记录撤回历史
+        history.push({
+            tile: tile,
+            fromState: 'board',
+            fromX: tile.x,
+            fromY: tile.y,
+            timestamp: Date.now()
+        });
+        if(history.length > 10) history.shift();
+        updateToolButtons();
+        
+        tile.state = 'bar';
+        collectionBar.push(tile);
+        playSound('click');
+        
+        collectionBar.sort((a, b) => a.type.id - b.type.id);
+        updateBarPositions();
+
+        setTimeout(() => checkMatch(), 600);
+    }
+
+    function movePendingToBar(tile, index) {
+        // 记录撤回历史
+        history.push({
+            tile: tile,
+            fromState: 'pending',
+            fromX: tile.x,
+            fromY: tile.y,
+            timestamp: Date.now()
+        });
+        if(history.length > 10) history.shift();
+        updateToolButtons();
+        
+        pendingTiles.splice(index, 1);
+        tile.state = 'bar';
+        collectionBar.push(tile);
+        playSound('click');
+        
+        collectionBar.sort((a, b) => a.type.id - b.type.id);
+        updateBarPositions();
+
+        setTimeout(() => checkMatch(), 600);
+    }
+
+    function updateBarPositions() {
+        let startX = (width - BAR_SLOTS * (TILE_SIZE + 5)) / 2 + TILE_SIZE/2;
+        collectionBar.forEach((t, index) => {
+            t.targetX = startX + index * (TILE_SIZE + 5);
+            t.targetY = barY;
+        });
+    }
+
+    function updatePendingPositions() {
+        let startX = width / 2 - (pendingTiles.length * (TILE_SIZE + 8)) / 2 + TILE_SIZE/2;
+        let pendingY = barY - TILE_SIZE - 25;
+        pendingTiles.forEach((t, index) => {
+            t.targetX = startX + index * (TILE_SIZE + 8);
+            t.targetY = pendingY;
+        });
+    }
+
+    function checkMatch() {
+        let typeCounts = {};
+        collectionBar.forEach(t => {
+            typeCounts[t.type.id] = (typeCounts[t.type.id] || 0) + 1;
+        });
+
+        for (let id in typeCounts) {
+            if (typeCounts[id] >= 3) {
+                let matched = collectionBar.filter(t => t.type.id == id).slice(0, 3);
+                
+                collectionBar = collectionBar.filter(t => !matched.includes(t));
+                updateBarPositions();
+
+                let centerX = matched.length > 1 ? matched[1].targetX : matched[0].targetX;
+                createParticles(centerX, barY, matched[0].type.color, 20);
+                playSound('match');
+                
+                matched.forEach(t => t.state = 'eliminated');
+
+                let quotes = themes[currentTheme].quotes;
+                spawnFloatingText(width/2, barY - 60, quotes[Math.floor(Math.random()*quotes.length)]);
+                // 使用setTimeout延迟检查胜利，确保所有消除完成后再检测
+                setTimeout(() => checkWinCondition(), 100);
+                return;
+            }
+        }
+        
+        // 如果没有匹配，立即检查胜利条件
+        checkWinCondition();
+
+        // 检查游戏结束
+        if (collectionBar.length >= BAR_SLOTS) {
+            gameState = 'GAMEOVER';
+            playSound('error');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            const reviveBtn = document.getElementById('revive-btn');
+            if(hasRevived) {
+                reviveBtn.style.display = 'none';
+                document.getElementById('game-over-text').textContent = '复活机会已用完，槽位已满...';
+            } else {
+                reviveBtn.style.display = 'block';
+                document.getElementById('game-over-text').textContent = '卡槽已经塞不下更多卡牌了...';
+            }
+        }
+    }
+    
+    // 单独的胜利检测函数
+    function checkWinCondition() {
+        let remaining = tiles.filter(t => t.state !== 'eliminated').length;
+        if (remaining === 0 && pendingTiles.length === 0 && collectionBar.length === 0) {
+            gameState = 'WIN';
+            playSound('win');
+            document.getElementById('win-screen').classList.remove('hidden');
+            let quotes = themes[currentTheme].quotes;
+            document.getElementById('win-text').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+            // 发送消息给父窗口，通知游戏完成
+            parent.postMessage('yulegeyuCompleted', '*');
+        }
+    }
+
+    // --- 道具系统 ---
+    function updateToolButtons() {
+        document.getElementById('btn-remove').disabled = toolsUsed.remove;
+        document.getElementById('btn-undo').disabled = toolsUsed.undo || history.length === 0;
+        document.getElementById('btn-shuffle').disabled = toolsUsed.shuffle || isShuffling;
+    }
+
+    function useRemove() {
+        if(toolsUsed.remove || collectionBar.length === 0) return;
+        
+        playSound('tool');
+        toolsUsed.remove = true;
+        updateToolButtons();
+        
+        let count = Math.min(3, collectionBar.length);
+        for(let i=0; i<count; i++) {
+            let tile = collectionBar.shift();
+            tile.state = 'pending';
+            pendingTiles.push(tile);
+        }
+        
+        updateBarPositions();
+        updatePendingPositions();
+        
+        spawnFloatingText(width/2, height/2 - 50, "移除！卡牌已移回场上");
+        createParticles(width/2, barY, '#ff9ff3', 15);
+    }
+
+    function useUndo() {
+        if(toolsUsed.undo || history.length === 0) return;
+        
+        let lastMove = history.pop();
+        let tile = lastMove.tile;
+        
+        // 检查卡牌是否在卡槽中
+        let tileIndex = collectionBar.indexOf(tile);
+        if(tileIndex === -1) {
+            // 卡牌不在卡槽中，可能已经被消除，尝试找下一个历史记录
+            if(history.length > 0) {
+                useUndo(); // 递归尝试撤回更早的记录
+            }
+            return;
+        }
+        
+        playSound('tool');
+        toolsUsed.undo = true;
+        updateToolButtons();
+        
+        // 从卡槽移除
+        collectionBar.splice(tileIndex, 1);
+        
+        // 恢复卡牌状态
+        tile.state = lastMove.fromState;
+        tile.targetX = lastMove.fromX;
+        tile.targetY = lastMove.fromY;
+        tile.x = lastMove.fromX;
+        tile.y = lastMove.fromY;
+        
+        // 如果是从pending区域来的，放回pending
+        if(lastMove.fromState === 'pending') {
+            pendingTiles.push(tile);
+            updatePendingPositions();
+        }
+        
+        updateBarPositions();
+        spawnFloatingText(width/2, height/2 - 50, "撤回成功！");
+        createParticles(tile.x, tile.y, '#54a0ff', 10);
+    }
+
+    // --- 洗牌动画 ---
+    function useShuffle() {
+        if(toolsUsed.shuffle || isShuffling) return;
+        
+        isShuffling = true;
+        updateToolButtons();
+        playSound('shuffle');
+        
+        let boardTiles = tiles.filter(t => t.state === 'board');
+        if(boardTiles.length < 2) {
+            isShuffling = false;
+            updateToolButtons();
+            return;
+        }
+        
+        let originalTypes = boardTiles.map(t => t.type);
+        let shuffledTypes = [...originalTypes].sort(() => 0.5 - Math.random());
+        
+        let animationDuration = 800;
+        let startTime = Date.now();
+        
+        function animateShuffle() {
+            let elapsed = Date.now() - startTime;
+            let progress = Math.min(elapsed / animationDuration, 1);
+            
+            if(progress < 0.5) {
+                let flipProgress = progress * 2;
+                boardTiles.forEach((t, i) => {
+                    t.flipScale = 1 - flipProgress;
+                });
+            } else if(progress >= 0.5 && progress < 0.55) {
+                boardTiles.forEach((t, i) => {
+                    t.type = shuffledTypes[i];
+                    t.flipScale = 0;
+                });
+            } else {
+                let flipProgress = (progress - 0.5) * 2;
+                boardTiles.forEach((t, i) => {
+                    t.flipScale = flipProgress;
+                });
+            }
+            
+            if(progress < 1) {
+                requestAnimationFrame(animateShuffle);
+            } else {
+                boardTiles.forEach(t => {
+                    t.flipScale = 1;
+                });
+                isShuffling = false;
+                toolsUsed.shuffle = true;
+                updateToolButtons();
+                spawnFloatingText(width/2, height/2, "洗牌完成！");
+                createParticles(width/2, height/2, '#feca57', 30);
+            }
+        }
+        
+        animateShuffle();
+    }
+
+    function returnToMenu() {
+        clearInterval(quizTimer);
+        gameState = 'START';
+        document.getElementById('start-screen').classList.remove('hidden');
+        document.getElementById('btn-back').classList.add('hidden');
+        document.getElementById('top-bar').classList.add('hidden');
+        document.getElementById('tools-bar').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('win-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('revive-hint').style.display = 'none';
+        tiles = [];
+        collectionBar = [];
+        pendingTiles = [];
+        smashBlocks = [];
+        floatingTexts = [];
+        history = [];
+    }
+
+    // --- 特效系统 - 手机端优化，减少粒子数量 ---
+    function createParticles(x, y, color, count) {
+        // 手机端限制粒子数量
+        let mobileCount = Math.min(count, 8);
+        for(let i=0; i<mobileCount; i++) {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = Math.random() * 4 + 1;
+            particles.push({
+                x: x, y: y,
+                vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+                life: 1, color: color, size: Math.random()*3 + 2
+            });
+        }
+    }
+
+    function spawnFloatingText(x, y, text, scale = 1) {
+        floatingTexts.push({
+            x: x, y: y, text: text,
+            life: 1.8, dy: -0.8, scale: scale
+        });
+    }
+
+    // --- 渲染引擎 - 手机端深度优化 ---
+    let lastDrawTime = 0;
+    const TARGET_FPS = isMobile ? 30 : 60; // 手机端限制30fps
+    const FRAME_INTERVAL = 1000 / TARGET_FPS;
+    let needsRedraw = true;
+    
+    function draw(currentTime) {
+        requestAnimationFrame(draw);
+        
+        // 限制帧率
+        if (currentTime - lastDrawTime < FRAME_INTERVAL) return;
+        lastDrawTime = currentTime;
+        
+        // 只有需要时才重绘
+        if (!needsRedraw && gameState === 'PLAYING') {
+            // 检查是否有动画中的卡牌
+            let hasAnimatingTile = false;
+            for (let t of tiles) {
+                if (t.state !== 'eliminated' && (Math.abs(t.x - t.targetX) > 0.5 || Math.abs(t.y - t.targetY) > 0.5)) {
+                    hasAnimatingTile = true;
+                    break;
+                }
+            }
+            if (!hasAnimatingTile && particles.length === 0 && floatingTexts.length === 0) return;
+        }
+        needsRedraw = false;
+        
+        ctx.clearRect(0, 0, width, height);
+
+        if (gameState === 'SMASH') {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            smashBlocks.forEach(b => {
+                if(b.broken) return;
+                b.x += b.vx; b.y += b.vy;
+                if(b.x - b.w/2 < 0 || b.x + b.w/2 > width) b.vx *= -1;
+                if(b.y - b.h/2 < 0 || b.y + b.h/2 > height) b.vy *= -1;
+
+                ctx.fillStyle = '#2d3436';
+                ctx.beginPath(); 
+                ctx.roundRect(b.x - b.w/2, b.y - b.h/2, b.w, b.h, 12); 
+                ctx.fill();
+                ctx.fillStyle = '#dfe6e9';
+                ctx.font = 'bold 16px PingFang SC';
+                ctx.fillText(b.text, b.x, b.y);
+            });
+            ctx.fillStyle = '#6c5ce7';
+            ctx.font = 'bold 18px PingFang SC';
+            ctx.fillText("点击击碎这些烦恼！", width/2, height * 0.75);
+        } 
+        else if (gameState === 'PLAYING' || gameState === 'GAMEOVER') {
+            // 绘制pending区域提示
+            if(pendingTiles.length > 0) {
+                ctx.fillStyle = 'rgba(255, 193, 7, 0.3)';
+                let pendingWidth = pendingTiles.length * (TILE_SIZE + 8) + 20;
+                ctx.beginPath();
+                ctx.roundRect(width/2 - pendingWidth/2, barY - TILE_SIZE - 40, pendingWidth, TILE_SIZE + 20, 10);
+                ctx.fill();
+                
+                ctx.fillStyle = '#f39c12';
+                ctx.font = 'bold 12px PingFang SC';
+                ctx.textAlign = 'center';
+                ctx.fillText("点击选择", width/2, barY - TILE_SIZE - 45);
+            }
+
+            // 绘制底部收集槽外框
+            let totalBarWidth = BAR_SLOTS * (TILE_SIZE + 5) + 15;
+            let barX = (width - totalBarWidth) / 2;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.roundRect(barX, barY - TILE_SIZE/2 - 10, totalBarWidth, TILE_SIZE + 20, 15);
+            ctx.fill();
+            
+            // 绘制槽位格子
+            for(let i=0; i<BAR_SLOTS; i++) {
+                let slotX = barX + 10 + i * (TILE_SIZE + 5);
+                ctx.strokeStyle = 'rgba(108, 92, 231, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(slotX, barY - TILE_SIZE/2, TILE_SIZE, TILE_SIZE, 8);
+                ctx.stroke();
+            }
+
+            // 绘制所有卡牌 - 优化：预计算可点击状态
+            let allTiles = [...tiles, ...pendingTiles];
+            allTiles.sort((a, b) => a.z - b.z);
+            
+            // 批量绘制，减少状态切换
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            allTiles.forEach(t => {
+                if (t.state === 'eliminated') return;
+
+                // 优化动画插值
+                let dx = t.targetX - t.x;
+                let dy = t.targetY - t.y;
+                if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+                    t.x += dx * 0.3;
+                    t.y += dy * 0.3;
+                    needsRedraw = true;
+                } else {
+                    t.x = t.targetX;
+                    t.y = t.targetY;
+                }
+
+                let clickable = (t.state === 'board') ? getClickable(t) : true;
+                let isPending = (t.state === 'pending');
+
+                // 手机端极简渲染
+                ctx.save();
+                ctx.translate(t.x, t.y);
+
+                // 极简阴影
+                ctx.shadowColor = isPending ? 'rgba(255, 193, 7, 0.3)' : 'rgba(0,0,0,0.1)';
+                ctx.shadowBlur = isPending ? 6 : 3;
+                ctx.shadowOffsetY = isPending ? 3 : 2;
+
+                // 背景
+                ctx.fillStyle = isPending ? '#fff3cd' : '#ffffff';
+                ctx.beginPath();
+                ctx.roundRect(-TILE_SIZE/2, -TILE_SIZE/2, TILE_SIZE, TILE_SIZE, 6);
+                ctx.fill();
+
+                ctx.shadowColor = 'transparent';
+                
+                // 边框
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = isPending ? '#f39c12' : (clickable ? t.type.color : '#bdc3c7');
+                ctx.beginPath();
+                ctx.roundRect(-TILE_SIZE/2, -TILE_SIZE/2, TILE_SIZE, TILE_SIZE, 6);
+                ctx.stroke();
+
+                // 表情
+                ctx.font = `${TILE_SIZE * 0.5}px Arial`;
+                ctx.globalAlpha = clickable || isPending ? 1 : 0.5;
+                ctx.fillText(t.type.emoji, 0, 1);
+                ctx.globalAlpha = 1;
+
+                ctx.restore();
+            });
+        }
+
+        // 绘制粒子 - 手机端进一步减少
+        if (particles.length > 0) {
+            needsRedraw = true;
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx; 
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.life -= 0.03;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath(); 
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); 
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        // 绘制漂浮文字
+        if (floatingTexts.length > 0) {
+            needsRedraw = true;
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                let ft = floatingTexts[i];
+                ft.y += ft.dy;
+                ft.life -= 0.015;
+                if (ft.life <= 0) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+                ctx.globalAlpha = ft.life;
+                ctx.font = `bold ${14 * ft.scale}px PingFang SC`;
+                ctx.fillStyle = '#6c5ce7';
+                ctx.fillText(ft.text, ft.x, ft.y);
+            }
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    draw();
+
+    // 兼容画圆角矩形
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.moveTo(x+r, y);
+            this.arcTo(x+w, y, x+w, y+h, r);
+            this.arcTo(x+w, y+h, x, y+h, r);
+            this.arcTo(x, y+h, x, y, r);
+            this.arcTo(x, y, x+w, y, r);
+            return this;
+        }
+    }
+</script>
+</body>
+</html>

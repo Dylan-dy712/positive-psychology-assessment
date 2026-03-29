@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>焦虑弹窗清除战</title>
+    <style>
+        :root { --primary: #FF4757; --bg: #F1F2F6; --text: #2F3542; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'PingFang SC', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        
+        main { flex: 1; position: relative; overflow: hidden; }
+        
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; background: var(--primary); color: white; margin-top: 10px; transition: transform 0.1s; }
+        .btn:active { transform: scale(0.95); }
+        input[type="text"] { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 14px; margin-top: 10px; outline: none; }
+        input[type="text"]:focus { border-color: var(--primary); }
+
+        /* 焦虑弹窗 (Win98 风格) */
+        .win98-bg { background: #008080; padding: 0; width: 100%; height: 100%; position: absolute; top:0; left:0; overflow-y: auto; }
+        .win-center-card { background: #c0c0c0; border: 2px solid; border-color: #fff #888 #888 #fff; padding: 2px; width: 90%; margin: 40px auto; }
+        .win-title { background: #000080; color: white; padding: 5px 10px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; }
+        .win-content { padding: 20px; background: #c0c0c0; text-align: center;}
+        
+        .popup { position: absolute; background: #c0c0c0; border: 2px solid; border-color: #fff #888 #888 #fff; width: 220px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); z-index: 50; animation: popBounce 0.3s; }
+        .popup-header { background: #000080; color: white; padding: 4px; font-size: 12px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .popup-close { background: #c0c0c0; border: 1px solid; border-color: #fff #888 #888 #fff; color: black; font-weight: bold; width: 20px; height: 20px; text-align: center; line-height: 18px; cursor: pointer; }
+        .popup-close:active { border-color: #888 #fff #fff #888; }
+        .popup-body { padding: 15px 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-family: '宋体', sans-serif;}
+        @keyframes popBounce { 0% {transform: scale(0.5);} 70% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        .blue-sky { display: none; background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); height: 100%; color: white; text-align: center; padding-top: 100px; }
+
+        .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 30px; font-size: 14px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1000;}
+        .toast.show { opacity: 1; top: 80px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>焦虑弹窗清除战</div>
+    </header>
+    <div id="toast" class="toast">提示</div>
+
+    <main>
+        <section class="win98-bg">
+            <div id="win98Input">
+                <div class="win-center-card">
+                    <div class="win-title"><span>⚠️ 系统警告</span><span>X</span></div>
+                    <div class="win-content">
+                        <img src="https://api.iconify.design/pixelarticons:alert.svg?color=%23000" width="40" style="margin-bottom: 10px;">
+                        <h3 style="color: black;">检测到大脑运存不足</h3>
+                        <p style="font-size: 12px; color: #333; margin-top: 5px;">请输入卡住你脑子的那个想法：</p>
+                        <input type="text" id="virusInput" placeholder="例如：明天的高数肯定要挂科了..." style="border: 2px inset #ddd; border-radius: 0; padding: 8px; margin-bottom: 15px;">
+                        <button class="btn" style="border: 2px outset #ddd; background: #c0c0c0; color: black; border-radius:0; padding: 8px;" onclick="triggerVirus()">确认</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="virusContainer"></div>
+
+            <div id="blueSky" class="blue-sky">
+                <h1 style="font-size: 40px; margin-bottom: 20px;">☁️</h1>
+                <h2>呼~ 世界清静了</h2>
+                <p style="margin: 20px; font-size: 14px; opacity: 0.9;">这只是一个随时可以关掉的想法<br>它不是事实。</p>
+                <button class="btn" style="width: 60%; background: white; color: #4facfe;" onclick="resetWin98()">重新体验</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        function vibratePhone() { if ("vibrate" in navigator) navigator.vibrate(30); }
+
+        let popupCount = 0;
+        function triggerVirus() {
+            const input = document.getElementById('virusInput').value || "我很焦虑！";
+            document.getElementById('win98Input').style.display = 'none';
+            
+            popupCount = 15;
+            const container = document.getElementById('virusContainer');
+            
+            for(let i=0; i<popupCount; i++) {
+                setTimeout(() => {
+                    vibratePhone();
+                    const pop = document.createElement('div');
+                    pop.className = 'popup';
+                    pop.style.left = Math.random() * (window.innerWidth - 240) + 10 + 'px';
+                    pop.style.top = Math.random() * (window.innerHeight - 300) + 50 + 'px';
+                    
+                    pop.innerHTML = `
+                        <div class="popup-header"><span>⚠️ 错误提示</span><div class="popup-close" onclick="closePopup(this)">X</div></div>
+                        <div class="popup-body">
+                            <img src="https://api.iconify.design/pixelarticons:close.svg?color=%23f00" width="30">
+                            <span>${input}</span>
+                        </div>
+                    `;
+                    container.appendChild(pop);
+                }, i * 100);
+            }
+        }
+
+        function closePopup(btn) {
+            vibratePhone();
+            const pop = btn.closest('.popup');
+            pop.remove();
+            popupCount--;
+            if(popupCount <= 0) {
+                document.getElementById('blueSky').style.display = 'block';
+            }
+        }
+
+        function resetWin98() {
+            document.getElementById('virusInput').value = '';
+            document.getElementById('blueSky').style.display = 'none';
+            document.getElementById('win98Input').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
