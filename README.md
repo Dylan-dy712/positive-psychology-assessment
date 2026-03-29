@@ -15,10 +15,24 @@
 - **丰富的可视化**：雷达图、线性量表、散点图、柱状图、饼图
 - **响应式设计**：移动端优先，适配各种屏幕尺寸
 
-### 个人中心功能（新增）
+### 心理储蓄功能（新增）
+- **心理货币体系**：通过日常练习积累心理货币
+- **每日活动**：
+  - 感恩日记 - 记录每日感恩时刻
+  - 心流时刻 - 追踪专注状态
+  - 希望盲盒 - 抽取希望卡片
+- **心理小游戏**：
+  - 🎮 焦虑弹窗 - 点击消除焦虑
+  - 🎮 夸夸消消乐 - 消除负面词汇
+  - 🎮 心渊猎手 - 潜入心渊收集能量
+  - 🎮 心愈战牌 - 卡牌对战心魔
+  - 🎮 愈了个愈 - 消除压力方块
+  - 🎮 心晴刮卡 - 刮刮乐抽奖
+
+### 个人中心功能
 - **启动页**：首次进入隐私协议确认，2-3秒启动动画
 - **个人中心**：用户信息展示、心理货币管理
-- **心理货币体系**：签到奖励、消费记录、积分明细
+- **心理货币明细**：分类显示收支记录，支持筛选查看
 - **每日签到**：7天签到周期，递增奖励机制
 - **账号管理**：头像、昵称、性别、年龄、年级编辑
 - **朋辈表情包**：5套表情包，二维码获取
@@ -54,14 +68,16 @@ src/
 │   └── assessments.ts   # 量表数据配置
 ├── pages/
 │   ├── LaunchPage.tsx   # 启动页
-│   ├── HomePage.tsx     # 首页
+│   ├── HomePage.tsx     # 首页（心灵档案）
 │   ├── AssessmentListPage.tsx   # 量表列表
 │   ├── AssessmentIntroPage.tsx  # 测评说明
 │   ├── QuizPage.tsx     # 答题页面
 │   ├── ReportPage.tsx   # 测评报告
-│   ├── HistoryPage.tsx  # 历史记录（心灵档案）
+│   ├── HistoryPage.tsx  # 历史记录
+│   ├── MentalSavePage.tsx       # 心理储蓄
 │   ├── MyPage.tsx       # 个人中心
-│   ├── CoinDetailPage.tsx  # 心理货币明细
+│   ├── CoinDetailPage.tsx       # 心理货币明细
+│   ├── CoinGuidePage.tsx        # 货币获取攻略
 │   ├── AccountPage.tsx  # 账号信息
 │   ├── CheckInPage.tsx  # 每日签到
 │   ├── EmojiPage.tsx    # 朋辈表情包
@@ -69,7 +85,32 @@ src/
 │   ├── ServicePage.tsx  # 在线客服
 │   ├── ServiceAgreementPage.tsx  # 用户服务协议
 │   ├── PrivacyPolicyPage.tsx     # 隐私保护政策
-│   └── index.ts
+│   │
+│   ├── # 心理储蓄功能页面
+│   ├── GratitudeDiaryPage.tsx           # 感恩日记
+│   ├── GratitudeThreeQuestionPage.tsx   # 三问记录
+│   ├── GratitudeFreeRecordPage.tsx      # 自由记录
+│   ├── GratitudeCalendarPage.tsx        # 感恩日历
+│   ├── FlowMomentPage.tsx               # 心流时刻
+│   ├── FlowMomentRecordPage.tsx         # 心流记录
+│   ├── FlowMomentPortraitPage.tsx       # 心流画像
+│   ├── FlowMomentCandyBoxPage.tsx       # 心流糖果盒
+│   ├── HopeBlindBoxPage.tsx             # 希望盲盒
+│   ├── HopeBlindBoxWishPage.tsx         # 许愿页面
+│   ├── HopeBlindBoxDrawPage.tsx         # 抽奖页面
+│   ├── HopeBlindBoxSuccessPage.tsx      # 中奖页面
+│   ├── HopeBlindBoxFailPage.tsx         # 未中奖页面
+│   ├── HopeBlindBoxSubmitPage.tsx       # 提交页面
+│   ├── HopeBlindBoxMemoirsPage.tsx      # 回忆录
+│   │
+│   ├── # 心理小游戏页面
+│   ├── AnxietyPopupGamePage.tsx   # 焦虑弹窗
+│   ├── KuakuaGamePage.tsx         # 夸夸消消乐
+│   ├── HeartHunterGamePage.tsx    # 心渊猎手
+│   ├── HeartCardsGamePage.tsx     # 心愈战牌
+│   ├── YulegeyuGamePage.tsx       # 愈了个愈
+│   └── HeartScratchGamePage.tsx   # 心晴刮卡
+│
 ├── utils/
 │   ├── storage.ts       # localStorage 工具
 │   ├── scoring.ts       # 计分逻辑
@@ -109,6 +150,26 @@ npm run preview
 | ERQ | 情绪调节问卷 | 10题 | 2-3分钟 |
 | RPWS | 心理幸福感量表 | 18题 | 4-6分钟 |
 
+## 🎮 心理小游戏说明
+
+### 焦虑弹窗
+点击弹出的焦虑词汇，消除焦虑，获得心理货币奖励。
+
+### 夸夸消消乐
+消除负面词汇，收集积极词汇，通过积极心理学答题复活。
+
+### 心渊猎手
+潜入心渊，收集心理能量，战胜心魔获得奖励。
+
+### 心愈战牌
+卡牌对战游戏，使用心理特质卡牌战胜敌人，每日首次通关奖励10枚心理货币。
+
+### 愈了个愈
+消除压力方块，通过积极心理学答题复活，通关奖励心理货币。
+
+### 心晴刮卡
+刮刮乐抽奖游戏，20%中奖率，每天最多产出25枚心理货币。
+
 ## 📊 签到奖励规则
 
 | 连续签到天数 | 奖励心理货币 |
@@ -122,6 +183,16 @@ npm run preview
 | 第7天 | 45枚 |
 
 连续签到满7天后自动开启新一轮签到周期。
+
+## 🎁 心理货币获取方式
+
+1. **每日签到** - 最高可获得45枚/天
+2. **完成测评** - 每次测评奖励心理货币
+3. **心理小游戏** - 通关奖励10枚心理货币
+4. **心晴刮卡** - 每天最多产出25枚心理货币
+5. **感恩日记** - 记录感恩时刻获得奖励
+6. **心流时刻** - 追踪专注状态获得奖励
+7. **希望盲盒** - 抽取希望卡片获得奖励
 
 ## 📦 部署
 
@@ -154,6 +225,9 @@ npm run deploy
 - 心理货币余额和交易记录
 - 测评历史记录
 - 签到记录
+- 感恩日记记录
+- 心流时刻记录
+- 希望盲盒记录
 - 反馈记录
 
 **注意**：清除浏览器缓存或更换设备会导致数据丢失。
@@ -174,3 +248,7 @@ npm run deploy
 
 - 联系邮箱：xinzhixinxiang525@126.com
 - 客服通道：小程序【我的】-【在线客服】
+
+---
+
+**最新更新时间**：2025年3月
