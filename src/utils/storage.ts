@@ -188,19 +188,28 @@ export const clearAssessmentProgress = (assessmentId: string): void => {
  */
 export const getCoinBalance = (): number => {
   try {
+    // 检查 localStorage 是否可用（微信浏览器可能限制）
+    if (typeof localStorage === 'undefined') {
+      console.warn('localStorage 不可用');
+      return 500; // 返回默认值
+    }
     const balance = localStorage.getItem(STORAGE_KEYS.COIN_BALANCE);
     if (balance === null) {
       // 初始余额为500
       const initialBalance = 500;
-      localStorage.setItem(STORAGE_KEYS.COIN_BALANCE, initialBalance.toString());
-      // 记录初始余额
-      addCoinRecord('earn', initialBalance, '新用户注册初始福利');
+      try {
+        localStorage.setItem(STORAGE_KEYS.COIN_BALANCE, initialBalance.toString());
+        // 记录初始余额
+        addCoinRecord('earn', initialBalance, '新用户注册初始福利');
+      } catch (e) {
+        console.warn('无法保存初始余额到 localStorage');
+      }
       return initialBalance;
     }
     return parseInt(balance, 10) || 0;
   } catch (error) {
     console.error('获取心理货币余额失败:', error);
-    return 0;
+    return 500; // 返回默认值而不是0
   }
 };
 
@@ -250,8 +259,18 @@ export const addCoinRecord = (type: 'earn' | 'spend', amount: number, reason: st
  */
 export const getCoinRecords = (): CoinRecord[] => {
   try {
+    // 检查 localStorage 是否可用（微信浏览器可能限制）
+    if (typeof localStorage === 'undefined') {
+      console.warn('localStorage 不可用');
+      return [];
+    }
     const data = localStorage.getItem(STORAGE_KEYS.COIN_RECORDS);
-    return data ? JSON.parse(data) : [];
+    if (!data) {
+      return [];
+    }
+    const records = JSON.parse(data);
+    // 确保返回的是数组
+    return Array.isArray(records) ? records : [];
   } catch (error) {
     console.error('获取心理货币记录失败:', error);
     return [];

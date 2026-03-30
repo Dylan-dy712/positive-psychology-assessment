@@ -133,7 +133,7 @@ export const FlowMomentPortraitPage = () => {
         <div className="bg-gray-50 rounded-xl p-4 shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <img src="/positive-psychology-assessment/assets/xlhx.png" alt="心流画像" className="w-56 h-56 object-contain" />
+              <img src="/positive-psychology-assessment/assets/beibei.png" alt="心流画像" className="w-56 h-56 object-contain" />
             </div>
             <div className="text-right">
               <p className="text-gray-700">近30天 心流次数：<span className="text-red-600 font-bold text-lg">{flowData.count}次</span></p>

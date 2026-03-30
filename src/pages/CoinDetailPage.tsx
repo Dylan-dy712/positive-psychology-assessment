@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Wallet, TrendingUp, TrendingDown, Gift, Gamepad2, Calendar, ShoppingBag, Star } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getCoinRecords, getCoinBalance } from '../utils/storage';
 
 // 定义 CoinRecord 类型
@@ -62,8 +62,24 @@ const getCategoryLabel = (description: string, type: 'earn' | 'spend'): string =
 export const CoinDetailPage = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState<'all' | 'earn' | 'spend'>('all');
-  const records = getCoinRecords() as CoinRecord[];
-  const currentBalance = getCoinBalance();
+  const [records, setRecords] = useState<CoinRecord[]>([]);
+  const [currentBalance, setCurrentBalance] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const coinRecords = getCoinRecords() || [];
+      const balance = getCoinBalance() || 0;
+      setRecords(coinRecords as CoinRecord[]);
+      setCurrentBalance(balance);
+    } catch (error) {
+      console.error('加载心理货币数据失败:', error);
+      setRecords([]);
+      setCurrentBalance(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const filteredRecords = tab === 'all' 
     ? records 
@@ -155,7 +171,12 @@ export const CoinDetailPage = () => {
 
         {/* 明细列表 */}
         <div className="space-y-3">
-          {filteredRecords.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500">加载中...</p>
+            </div>
+          ) : filteredRecords.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Wallet className="w-8 h-8 text-gray-400" />

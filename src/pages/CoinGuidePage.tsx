@@ -39,7 +39,7 @@ export const CoinGuidePage = () => {
       icon: '🎮',
       title: '心理小游戏',
       subtitle: '每日首次通关奖励',
-      content: '焦虑弹窗：首次完成得 5 枚\n夸夸消消乐：首次完成得 5 枚\n心渊猎手：首次通关得 10 枚\n心愈战牌：首次通关得 10 枚\n愈了个愈：首次通关得 10 枚\n心晴刮卡：特等奖15枚、一等奖10枚、二等奖5枚\n（刮卡每日最多产出25枚）',
+      content: '焦虑弹窗：首次完成得 5 枚\n夸夸消消乐：首次完成得 5 枚\n心渊猎手：首次通关得 10 枚\n心愈战牌：首次通关得 10 枚\n愈了个愈：首次通关得 10 枚\n心晴刮卡：特等奖15枚、一等奖10枚、二等奖5枚',
       color: 'bg-gradient-to-r from-yellow-100 to-amber-100',
       borderColor: 'border-yellow-200'
     }
