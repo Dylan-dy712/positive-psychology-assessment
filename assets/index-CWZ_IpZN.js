@@ -583,11 +583,19 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
         const type = TILE_TYPES[Math.floor(Math.random() * TILE_TYPES.length)];
         return { r: r, c: c, type: type, x: offsetX + c * tileSize, y: offsetY + r * tileSize, targetX: offsetX + c * tileSize, targetY: offsetY + r * tileSize, scale: 0 };
     }
+    function getEventPos(e) {
+        if(e.changedTouches && e.changedTouches.length > 0) {
+            return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        } else if(e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+    
     function handleInput(e) {
         if(e.cancelable) e.preventDefault();
-        let ex, ey;
-        if(e.touches) { ex = e.touches[0].clientX; ey = e.touches[0].clientY; }
-        else { ex = e.clientX; ey = e.clientY; }
+        let pos = getEventPos(e);
+        let ex = pos.x, ey = pos.y;
         if(gameState === 'STRESS_SMASH') {
             let allBroken = true;
             for(let b of stressBlocks) {
@@ -624,9 +632,17 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
             }
         }
     }
-    canvas.addEventListener('mousedown', handleInput);
-    canvas.addEventListener('touchstart', handleInput, {passive: false});
+    
+    // 使用 click 事件代替 mousedown/touchstart，支持点击选中
+    canvas.addEventListener('click', handleInput);
+    // 阻止 touchstart 的默认行为（如长按菜单、文本选择等）
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+    }, {passive: false});
+    // 阻止双击缩放
     canvas.addEventListener('dblclick', function(e) { e.preventDefault(); });
+    // 阻止上下文菜单
+    canvas.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     function swapTiles(t1, t2) {
         isAnimating = true;
         playSwapSound();
