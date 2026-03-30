@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>心智</title>
+    <script>
+      // 单页应用 GitHub Pages 重定向脚本
+      // 将路径转换为 hash 路由
+      var pathSegmentsToKeep = 1; // 保留的路径段数 (positive-psychology-assessment)
+      
+      var l = window.location;
+      var pathname = l.pathname;
+      
+      // 构建重定向 URL
+      var redirectUrl = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '');
+      redirectUrl += pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/#';
+      redirectUrl += pathname.slice(pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/').length);
+      redirectUrl += l.search + l.hash;
+      
+      window.location.replace(redirectUrl);
+    </script>
+  </head>
+  <body>
+    正在重定向...
+  </body>
+</html>
