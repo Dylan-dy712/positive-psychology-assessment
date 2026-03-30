@@ -429,7 +429,63 @@
     
     // 优化触摸体验 - 防止长按菜单和选择
     canvas.addEventListener('mousedown', handleInput);
-    canvas.addEventListener('touchstart', handleInput, {passive: false});
+    
+    // 移动端使用 touchend 事件代替 touchstart，解决微信浏览器长按问题
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        let ex, ey;
+        if(e.changedTouches && e.changedTouches[0]) {
+            ex = e.changedTouches[0].clientX;
+            ey = e.changedTouches[0].clientY;
+        } else {
+            return;
+        }
+        
+        if(gameState === 'STRESS_SMASH') {
+            // 点击粉碎压力方块
+            let allBroken = true;
+            for(let b of stressBlocks) {
+                if(!b.broken && ex > b.x - b.w/2 && ex < b.x + b.w/2 && ey > b.y - b.h/2 && ey < b.y + b.h/2) {
+                    b.broken = true;
+                    createParticles(b.x, b.y, '#e7dfdd', 10); // 暖灰色碎片
+                }
+                if(!b.broken) allBroken = false;
+            }
+            if(allBroken && stressBlocks.length > 0) {
+                stressBlocks = [];
+                // 转换到主游戏
+                setTimeout(() => {
+                    gameState = 'PLAYING';
+                    document.getElementById('game-header').classList.remove('hidden');
+                    document.getElementById('hint-text').classList.remove('hidden');
+                    initGrid();
+                }, 500);
+            }
+        } 
+        else if (gameState === 'PLAYING' && !isAnimating) {
+            // 找到点击的方块
+            let c = Math.floor((ex - offsetX) / tileSize);
+            let r = Math.floor((ey - offsetY) / tileSize);
+            
+            if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE && grid[r][c]) {
+                if (!selectedTile) {
+                    selectedTile = grid[r][c];
+                } else {
+                    let tile1 = selectedTile;
+                    let tile2 = grid[r][c];
+                    // 判断是否相邻
+                    let isAdjacent = Math.abs(tile1.r - tile2.r) + Math.abs(tile1.c - tile2.c) === 1;
+                    
+                    if (isAdjacent) {
+                        swapTiles(tile1, tile2);
+                    }
+                    selectedTile = null;
+                }
+            } else {
+                selectedTile = null;
+            }
+        }
+    }, {passive: false});
     
     // 禁用双击缩放
     canvas.addEventListener('dblclick', function(e) {
@@ -438,10 +494,6 @@
     
     // 禁用触摸时的默认行为（防止长按菜单、文本选择等）
     canvas.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-    }, {passive: false});
-    
-    canvas.addEventListener('touchend', function(e) {
         e.preventDefault();
     }, {passive: false});
     
@@ -482,9 +534,6 @@
         e.preventDefault();
         return false;
     });
-    
-    // 移除触摸延迟
-    document.addEventListener('touchstart', function(e) {}, {passive: true});
 
     // --- 核心逻辑：交换与匹配 ---
     function swapTiles(t1, t2) {
