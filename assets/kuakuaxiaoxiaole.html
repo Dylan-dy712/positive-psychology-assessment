@@ -482,6 +482,9 @@
         e.preventDefault();
         return false;
     });
+    
+    // 移除触摸延迟
+    document.addEventListener('touchstart', function(e) {}, {passive: true});
 
     // --- 核心逻辑：交换与匹配 ---
     function swapTiles(t1, t2) {
