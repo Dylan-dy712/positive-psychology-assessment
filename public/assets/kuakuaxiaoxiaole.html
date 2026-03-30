@@ -430,7 +430,38 @@
     // 优化触摸体验 - 防止长按菜单和选择
     canvas.addEventListener('mousedown', handleInput);
     
-    // 移动端使用 touchend 事件代替 touchstart，解决微信浏览器长按问题
+    // 移动端触摸事件处理 - 同时使用 touchstart 和 touchend 确保响应
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        let ex = e.touches[0].clientX;
+        let ey = e.touches[0].clientY;
+        
+        if(gameState === 'PLAYING' && !isAnimating) {
+            // 找到点击的方块
+            let c = Math.floor((ex - offsetX) / tileSize);
+            let r = Math.floor((ey - offsetY) / tileSize);
+            
+            if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE && grid[r][c]) {
+                if (!selectedTile) {
+                    selectedTile = grid[r][c];
+                } else {
+                    let tile1 = selectedTile;
+                    let tile2 = grid[r][c];
+                    // 判断是否相邻
+                    let isAdjacent = Math.abs(tile1.r - tile2.r) + Math.abs(tile1.c - tile2.c) === 1;
+                    
+                    if (isAdjacent) {
+                        swapTiles(tile1, tile2);
+                    }
+                    selectedTile = null;
+                }
+            } else {
+                selectedTile = null;
+            }
+        }
+    }, {passive: false});
+    
+    // 压力方块使用 touchend 事件
     canvas.addEventListener('touchend', function(e) {
         e.preventDefault();
         let ex, ey;
@@ -461,29 +492,6 @@
                     initGrid();
                 }, 500);
             }
-        } 
-        else if (gameState === 'PLAYING' && !isAnimating) {
-            // 找到点击的方块
-            let c = Math.floor((ex - offsetX) / tileSize);
-            let r = Math.floor((ey - offsetY) / tileSize);
-            
-            if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE && grid[r][c]) {
-                if (!selectedTile) {
-                    selectedTile = grid[r][c];
-                } else {
-                    let tile1 = selectedTile;
-                    let tile2 = grid[r][c];
-                    // 判断是否相邻
-                    let isAdjacent = Math.abs(tile1.r - tile2.r) + Math.abs(tile1.c - tile2.c) === 1;
-                    
-                    if (isAdjacent) {
-                        swapTiles(tile1, tile2);
-                    }
-                    selectedTile = null;
-                }
-            } else {
-                selectedTile = null;
-            }
         }
     }, {passive: false});
     
@@ -507,6 +515,8 @@
     canvas.style.userSelect = 'none';
     canvas.style.webkitUserSelect = 'none';
     canvas.style.touchAction = 'none';
+    canvas.style.webkitTapHighlightColor = 'transparent';
+    canvas.style.cursor = 'pointer';
     
     // 额外的移动端优化：防止页面滚动和缩放
     document.body.addEventListener('touchmove', function(e) {
