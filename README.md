@@ -116,7 +116,13 @@ src/
 │   ├── HeartHunterGamePage.tsx    # 心渊猎手
 │   ├── HeartCardsGamePage.tsx     # 心愈战牌
 │   ├── YulegeyuGamePage.tsx       # 愈了个愈
-│   └── HeartScratchGamePage.tsx   # 心晴刮卡
+│   ├── HeartScratchGamePage.tsx   # 心晴刮卡
+│   │
+│   ├── # 兑换商城功能页面
+│   ├── ExchangePage.tsx           # 兑换商城首页
+│   ├── ExchangeRulePage.tsx       # 兑换规则
+│   ├── ExchangeRecordPage.tsx     # 兑换记录
+│   └── ExchangeDetailPage.tsx     # 兑换详情
 │
 ├── utils/
 │   ├── storage.ts       # localStorage 工具
