@@ -56,7 +56,7 @@ export const MyPage = () => {
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <img src="/assets/xinlihuobi.svg" alt="心理货币" className="w-8 h-8" />
+                  <img src="./assets/xinlihuobi.svg" alt="心理货币" className="w-8 h-8" />
                   <span className="font-bold text-white">我的心理货币</span>
                 </div>
               </div>

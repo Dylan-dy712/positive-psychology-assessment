@@ -135,7 +135,7 @@ export const ExchangePage = () => {
         <div className="px-4 mb-6">
           <div className="bg-purple-600 rounded-xl p-4 shadow-lg flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src="/assets/exchange/xinlihuobi.svg" alt="心理货币" className="w-10 h-10" />
+              <img src="./assets/exchange/xinlihuobi.svg" alt="心理货币" className="w-10 h-10" />
               <div>
                 <p className="text-white text-sm">我的心理货币</p>
                 <p className="text-white text-2xl font-bold">{coinBalance} 枚</p>
@@ -185,7 +185,7 @@ export const ExchangePage = () => {
               >
                 <div className="mb-3">
                   <img 
-                    src={`/assets/exchange/${product.image}`} 
+                    src={`./assets/exchange/${product.image}`} 
                     alt={product.name} 
                     className="w-full h-36 object-contain"
                   />

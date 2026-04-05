@@ -34,7 +34,7 @@ export interface FeedbackRecord {
 }
 
 export const getAssetPath = (filename: string): string => {
-  return `/assets/${filename}`;
+  return `./assets/${filename}`;
 };
 
 const defaultUserData: UserData = {

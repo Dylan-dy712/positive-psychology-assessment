@@ -20,7 +20,7 @@ export const MentalSavePage = () => {
             <h2 className="text-blue-600 text-lg font-bold mb-1">欢迎来到心理银行!</h2>
             <p className="text-gray-600 text-sm">通过日常积极心理练习积累心理货币，提升心理健康水平</p>
           </div>
-          <img src="/assets/pengpengbeibei.png" alt="PengPengBeiBei" className="w-24 h-24 object-contain flex-shrink-0" />
+          <img src="./assets/pengpengbeibei.png" alt="PengPengBeiBei" className="w-24 h-24 object-contain flex-shrink-0" />
         </div>
 
         {/* 心理货币余额区 */}
@@ -28,7 +28,7 @@ export const MentalSavePage = () => {
           <div className="p-5 bg-[#6B55FF] rounded-xl shadow-md">
             <div className="flex flex-col">
               <div className="flex items-center gap-2 mb-3">
-                <img src="/assets/xinlihuobi.svg" alt="心理货币" className="w-6 h-6" />
+                <img src="./assets/xinlihuobi.svg" alt="心理货币" className="w-6 h-6" />
                 <span className="font-bold text-white text-sm">我的心理货币</span>
               </div>
               <div className="flex items-center justify-between">
@@ -61,21 +61,21 @@ export const MentalSavePage = () => {
                 onClick={() => navigate('/mental-save/gratitude-diary')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/rijitb.png" alt="感恩日记" className="w-14 h-14 object-contain" />
+                <img src="./assets/rijitb.png" alt="感恩日记" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">感恩日记</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/flow-moment')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/xltb.png" alt="心流时刻" className="w-14 h-14 object-contain" />
+                <img src="./assets/xltb.png" alt="心流时刻" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">心流时刻</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/hope-blind-box')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/xwmhtb.png" alt="希望盲盒" className="w-14 h-14 object-contain" />
+                <img src="./assets/xwmhtb.png" alt="希望盲盒" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">希望盲盒</span>
               </button>
             </div>
@@ -91,42 +91,42 @@ export const MentalSavePage = () => {
                 onClick={() => navigate('/mental-save/games/anxiety-popup')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/jltc.png" alt="焦虑弹窗" className="w-14 h-14 object-contain" />
+                <img src="./assets/jltc.png" alt="焦虑弹窗" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">焦虑弹窗</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/games/kuakua')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/kkxxl.png" alt="夸夸消消乐" className="w-14 h-14 object-contain" />
+                <img src="./assets/kkxxl.png" alt="夸夸消消乐" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">夸夸消消乐</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/games/heart-hunter')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/xyls.png" alt="心渊猎手" className="w-14 h-14 object-contain" />
+                <img src="./assets/xyls.png" alt="心渊猎手" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">心渊猎手</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/games/heart-cards')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/xyzp.png" alt="心愈战牌" className="w-14 h-14 object-contain" />
+                <img src="./assets/xyzp.png" alt="心愈战牌" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">心愈战牌</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/games/yulegeyu')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/ylgy.png" alt="愈了个愈" className="w-14 h-14 object-contain" />
+                <img src="./assets/ylgy.png" alt="愈了个愈" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">愈了个愈</span>
               </button>
               <button 
                 onClick={() => navigate('/mental-save/games/heart-scratch')}
                 className="flex flex-col items-center gap-2"
               >
-                <img src="/assets/xqgk.png" alt="心晴刮卡" className="w-14 h-14 object-contain" />
+                <img src="./assets/xqgk.png" alt="心晴刮卡" className="w-14 h-14 object-contain" />
                 <span className="text-xs font-medium text-gray-800">心晴刮卡</span>
               </button>
             </div>

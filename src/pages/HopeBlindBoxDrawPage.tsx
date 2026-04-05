@@ -168,7 +168,7 @@ export const HopeBlindBoxDrawPage = () => {
           className="w-64 h-64 animate-bounce"
           style={{ animationDuration: '0.5s', animationIterationCount: '6' }}
         >
-          <img src="/assets/manghe.png" alt="盲盒" className="w-full h-full object-contain" />
+          <img src="./assets/manghe.png" alt="盲盒" className="w-full h-full object-contain" />
         </div>
         <p className="mt-6 text-xl font-medium text-gray-700">盲盒抽取中···</p>
       </div>

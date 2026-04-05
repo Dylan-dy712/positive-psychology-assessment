@@ -43,7 +43,7 @@ export const BottomNav = () => {
           }`}
         >
           <img 
-            src={`/assets/${isMentalSaveActive ? 'xlcxxz.svg' : 'xlcxwx.svg'}`} 
+            src={`./assets/${isMentalSaveActive ? 'xlcxxz.svg' : 'xlcxwx.svg'}`} 
             alt="心理储蓄" 
             className="w-6 h-6 sm:w-7 sm:h-7"
           />
@@ -56,7 +56,7 @@ export const BottomNav = () => {
           }`}
         >
           <img 
-            src={`/assets/exchange/${isExchangeActive ? 'duihuanxz.svg' : 'duihuanwx.svg'}`} 
+            src={`./assets/exchange/${isExchangeActive ? 'duihuanxz.svg' : 'duihuanwx.svg'}`} 
             alt="兑换" 
             className="w-6 h-6 sm:w-7 sm:h-7"
           />

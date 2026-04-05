@@ -25,7 +25,7 @@ export const ServicePage = () => {
         <div className="px-4 pb-6">
           <div className="bg-white rounded-xl p-6 shadow-sm text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <img src="/assets/AIhuoban.svg" alt="AI伙伴" className="w-16 h-16" />
+              <img src="./assets/AIhuoban.svg" alt="AI伙伴" className="w-16 h-16" />
             </div>
             <p className="text-gray-800 font-medium mb-2">AI伙伴</p>
             <p className="text-gray-500 text-sm mb-6">该功能正在开发中</p>

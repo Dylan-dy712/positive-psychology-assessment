@@ -116,7 +116,7 @@ export const GratitudeFreeRecordPage = () => {
               id="photo-upload"
             />
             <label htmlFor="photo-upload" className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-[#FFA203] transition-colors w-full">
-              <img src="/assets/schtp.svg" alt="上传" className="w-full max-w-md h-48 object-contain" />
+              <img src="./assets/schtp.svg" alt="上传" className="w-full max-w-md h-48 object-contain" />
               <span className="text-gray-600 text-lg font-medium">点击上传照片</span>
             </label>
             {photo && (

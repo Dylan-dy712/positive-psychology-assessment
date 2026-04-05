@@ -87,7 +87,7 @@ export const HopeBlindBoxSubmitPage = () => {
               <img src={photo} alt="任务完成" className="w-full h-full object-cover rounded-lg" />
             ) : (
               <div className="text-center flex flex-col items-center justify-center h-full">
-                <img src="/assets/schtp.svg" alt="上传" className="w-32 h-32 mb-6" />
+                <img src="./assets/schtp.svg" alt="上传" className="w-32 h-32 mb-6" />
                 <p className="text-gray-600 text-lg font-medium">点击上传照片</p>
               </div>
             )}

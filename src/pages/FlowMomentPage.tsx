@@ -4,7 +4,7 @@ export const FlowMomentPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(/assets/xinliushike.png)' }}>
+    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(./assets/xinliushike.png)' }}>
       {/* 顶部导航栏 */}
       <div className="flex items-center justify-between p-4 bg-transparent">
         <button 
@@ -21,14 +21,14 @@ export const FlowMomentPage = () => {
             onClick={() => navigate('/mental-save/flow-moment/portrait')}
             className="flex flex-col items-center gap-1 p-1"
           >
-            <img src="/assets/xlhx.png" alt="心流画像" className="w-28 h-28 object-contain drop-shadow-lg" />
+            <img src="./assets/xlhx.png" alt="心流画像" className="w-28 h-28 object-contain drop-shadow-lg" />
             <span className="text-xs font-medium text-white drop-shadow-md">心流画像</span>
           </button>
           <button 
             onClick={() => navigate('/mental-save/flow-moment/candy-box')}
             className="flex flex-col items-center gap-1 p-1"
           >
-            <img src="/assets/tangguohe.png" alt="糖果盒" className="w-28 h-28 object-contain drop-shadow-lg" />
+            <img src="./assets/tangguohe.png" alt="糖果盒" className="w-28 h-28 object-contain drop-shadow-lg" />
             <span className="text-xs font-medium text-white drop-shadow-md">糖果盒</span>
           </button>
         </div>

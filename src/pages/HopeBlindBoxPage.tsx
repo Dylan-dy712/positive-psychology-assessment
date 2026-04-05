@@ -26,7 +26,7 @@ export const HopeBlindBoxPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(/assets/xiwangmanghe.png)' }}>
+    <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: 'url(./assets/xiwangmanghe.png)' }}>
       {/* 顶部导航栏 */}
       <div className="flex items-center justify-between p-4 bg-transparent">
         <button 
@@ -42,7 +42,7 @@ export const HopeBlindBoxPage = () => {
           onClick={() => navigate('/mental-save/hope-blind-box/memoirs')}
           className="flex flex-col items-center gap-1 p-2"
         >
-          <img src="/assets/mhhyl.png" alt="盲盒回忆录" className="w-36 h-36 object-contain drop-shadow-lg" />
+          <img src="./assets/mhhyl.png" alt="盲盒回忆录" className="w-36 h-36 object-contain drop-shadow-lg" />
           <span className="text-sm font-medium text-white drop-shadow-md">盲盒回忆录</span>
         </button>
       </div>

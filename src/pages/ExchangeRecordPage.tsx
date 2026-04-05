@@ -76,7 +76,7 @@ export const ExchangeRecordPage = () => {
                 <div className="flex gap-4">
                   <div className="w-24 h-24 flex items-center justify-center flex-shrink-0">
                     <img 
-                      src={`/assets/exchange/${record.productImage}`} 
+                      src={`./assets/exchange/${record.productImage}`} 
                       alt={record.productName} 
                       className="w-full h-full object-contain"
                     />

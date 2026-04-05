@@ -103,7 +103,7 @@ export const FlowMomentCandyBoxPage = () => {
           }}
         >
           <div className="text-center">
-            <img src="/assets/tangguohe.png" alt="糖果盒" className="w-56 h-56 object-contain mx-auto" />
+            <img src="./assets/tangguohe.png" alt="糖果盒" className="w-56 h-56 object-contain mx-auto" />
             <p className="mt-2 text-pink-600 font-medium">糖果盒</p>
           </div>
         </div>
@@ -114,7 +114,7 @@ export const FlowMomentCandyBoxPage = () => {
             className="mt-10 cursor-pointer animate-bounce"
             onClick={handleCandyClick}
           >
-            <img src="/assets/tangguo.png" alt="糖果" className="w-44 h-44 object-contain" />
+            <img src="./assets/tangguo.png" alt="糖果" className="w-44 h-44 object-contain" />
           </div>
         )}
 
