@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAssetPath } from '../utils/user';
-import { isAuthenticated } from '../utils/auth';
 
 export const LaunchPage = () => {
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
+  const [showModal] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
